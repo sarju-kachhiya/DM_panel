@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdminPanel - Authentication</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+  :root {
+    --accent: #6366f1;
+    --text-muted: #94a3b8;
+    --border: #e2e8f0;
+  }
+  
+  * { box-sizing: border-box; }
+  
+  body { 
+    font-family: 'Segoe UI', sans-serif; 
+    /* ── UPDATED BACKGROUND ── */
+    /* Point this URL to where you saved the generated image */
+    background: url('assets/bg.png') no-repeat center center fixed; 
+    background-size: cover;
+    margin: 0; 
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* ── AUTH CARD (GLASS EFFECT ADDED) ── */
+  .auth-wrapper {
+    width: 100%;
+    max-width: 420px;
+  }
+  
+  .auth-card {
+    background: rgba(255, 255, 255, 0.96); /* Slight transparency */
+    backdrop-filter: blur(12px); /* Glass blur effect */
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.6); /* Softened border */
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15); /* Deeper shadow for depth */
+    overflow: hidden;
+  }
+
+  /* ── HEADER & LOGO ── */
+  .auth-header {
+    padding: 30px 30px 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  }
+  
+  .auth-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  
+  .auth-logo .logo-icon {
+    width: 42px; 
+    height: 42px; 
+    background: var(--accent); 
+    border-radius: 10px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 20px; 
+    color: #fff; 
+  }
+  
+  .auth-logo span { 
+    font-size: 20px; 
+    font-weight: 700; 
+    color: #1e293b;
+    letter-spacing: -0.5px;
+  }
+
+  .auth-header p {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  /* ── TOGGLE TABS ── */
+  .auth-tabs {
+    display: flex;
+    background: rgba(248, 250, 252, 0.8);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  }
+  
+  .auth-tab {
+    flex: 1;
+    text-align: center;
+    padding: 14px 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+  }
+  
+  .auth-tab:hover {
+    color: #1e293b;
+    background: rgba(241, 245, 249, 0.9);
+  }
+  
+  .auth-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: transparent;
+  }
+
+  /* ── FORMS ── */
+  .auth-body {
+    padding: 30px;
+  }
+  
+  .auth-form {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .auth-form.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .form-label { 
+    font-size: 12px; 
+    font-weight: 600; 
+    color: #374151; 
+    margin-bottom: 6px; 
+  }
+  
+  .form-control { 
+    font-size: 13.5px; 
+    border-radius: 7px; 
+    border: 1px solid #d1d5db; 
+    padding: 10px 14px;
+    color: #1e293b;
+    background: rgba(255, 255, 255, 0.8);
+  }
+  
+  .form-control::placeholder {
+    color: #94a3b8;
+  }
+
+  .form-control:focus { 
+    border-color: var(--accent); 
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.12); 
+    background: #fff;
+  }
+
+  /* ── BUTTONS & LINKS ── */
+  .btn-primary-custom {
+    background: var(--accent); 
+    color: #fff; 
+    border: none; 
+    border-radius: 8px;
+    padding: 10px 18px; 
+    font-size: 14px; 
+    font-weight: 600; 
+    width: 100%;
+    transition: background 0.15s, transform 0.1s;
+    margin-top: 10px;
+  }
+  
+  .btn-primary-custom:hover { 
+    background: #4f46e5; 
+  }
+  
+  .btn-primary-custom:active {
+    transform: scale(0.98);
+  }
+
+  .auth-link {
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  
+  .auth-link:hover {
+    text-decoration: underline;
+  }
+
+  .password-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    
+    <div class="auth-header">
+      <div class="auth-logo">
+        <div class="logo-icon"><i class="bi bi-layers-half"></i></div>
+        <span>AdminPanel</span>
+      </div>
+      <p id="auth-subtitle">Welcome back! Please enter your details.</p>
+    </div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</div>
+      <div class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</div>
+    </div>
+
+    <div class="auth-body">
+      <form class="auth-form active" id="form-login">
+        <div class="mb-3">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-control" placeholder="admin@haridarshaninc.com" required>
+        </div>
+        <div class="mb-4">
+          <div class="password-header">
+            <label class="form-label">Password</label>
+            <a href="#" class="auth-link">Forgot password?</a>
+          </div>
+          <input type="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <div class="mb-4 form-check">
+          <input type="checkbox" class="form-check-input" id="rememberMe">
+          <label class="form-check-label" for="rememberMe" style="font-size: 12.5px; color: #64748b; font-weight: 500;">Remember me for 30 days</label>
+        </div>
+        <button type="submit" class="btn-primary-custom">Sign In to Dashboard</button>
+      </form>
+
+      <form class="auth-form" id="form-register">
+        <div class="mb-3">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-control" placeholder="Rahul Sharma" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-control" placeholder="name@haridarshaninc.com" required>
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Create Password</label>
+          <input type="password" class="form-control" placeholder="••••••••" required>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Must be at least 8 characters.</div>
+        </div>
+        <button type="submit" class="btn-primary-custom">Create Account</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function switchTab(tab) {
+    // Tab Highlighting
+    document.getElementById('tab-login').classList.remove('active');
+    document.getElementById('tab-register').classList.remove('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+
+    // Form Switching
+    document.getElementById('form-login').classList.remove('active');
+    document.getElementById('form-register').classList.remove('active');
+    document.getElementById('form-' + tab).classList.add('active');
+
+    // Dynamic Subtitle
+    const subtitle = document.getElementById('auth-subtitle');
+    if (tab === 'login') {
+      subtitle.textContent = 'Welcome back! Please enter your details.';
+    } else {
+      subtitle.textContent = 'Create a new admin account to get started.';
+    }
+  }
+
+  // Prevent actual form submission for UI demo
+  document.getElementById('form-login').addEventListener('submit', e => e.preventDefault());
+  document.getElementById('form-register').addEventListener('submit', e => e.preventDefault());
+</script>
+
+</body>
+</html>
