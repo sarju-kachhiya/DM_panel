@@ -162,8 +162,9 @@
   .topbar {
     background: var(--header-bg); border-bottom: 1px solid var(--border);
     padding: 14px 28px; display: flex; align-items: center; gap: 16px;
-    position: sticky; top: 0; z-index: 100;
+    position: sticky; top: 0; z-index: 100; justify-content: flex-start;
   }
+  .topbar > div { flex: 1; min-width: 0; }
   .topbar h5 { margin: 0; font-size: 15px; font-weight: 600; color: #1e293b; }
   .topbar .breadcrumb { margin: 0; font-size: 12px; }
   .content-area { padding: 28px; }
@@ -324,6 +325,17 @@
   }
   .btn-add-domain:hover { background: rgba(99,102,241,0.2); border-style: solid; }
 
+  /* Mobile topbar logout button */
+  .btn-topbar-logout {
+    display: flex; align-items: center; gap: 6px;
+    margin-left: auto; padding: 7px 13px; border-radius: 8px; border: none;
+    background: rgba(239,68,68,0.10); color: #dc2626;
+    font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;
+    transition: background .15s, color .15s; flex-shrink: 0;
+  }
+  .btn-topbar-logout:hover { background: rgba(239,68,68,0.18); color: #b91c1c; }
+  .btn-topbar-logout i { font-size: 15px; }
+
   .sidebar-close-btn {
     display: none; align-items: center; justify-content: center;
     width: 28px; height: 28px; border-radius: 6px; border: none;
@@ -411,6 +423,39 @@
     .topbar { padding: 12px 16px; }
     .card-view-topbar { flex-direction: column; align-items: flex-start; }
   }
+  /* ── SOCIAL MEDIA PLATFORM BLOCKS ── */
+  .sm-platform-block {
+    border-radius: 8px; padding: 8px 10px; margin-bottom: 8px;
+    background: #f8fafc; border: 1px solid #e9eef5;
+  }
+  .sm-platform-block:last-child { margin-bottom: 0; }
+  .sm-platform-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 0;
+  }
+  .sm-platform-block .card-field { margin-top: 6px; margin-bottom: 4px; }
+  .sm-platform-block .card-field:last-child { margin-bottom: 0; }
+  .sm-platform-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11.5px; font-weight: 700; padding: 3px 9px;
+    border-radius: 20px; letter-spacing: .2px;
+  }
+  .sm-badge-linkedin  { background: #e8f0fe; color: #0a66c2; }
+  .sm-badge-instagram { background: #fce4f3; color: #c13584; }
+  .sm-badge-facebook  { background: #e7f0fd; color: #1877f2; }
+  .sm-has-badge {
+    font-size: 11px; font-weight: 700; padding: 2px 10px;
+    border-radius: 20px; letter-spacing: .3px;
+  }
+  .sm-has-badge.yes { background: #dcfce7; color: #15803d; }
+  .sm-has-badge.no  { background: #f1f5f9; color: #94a3b8; }
+
+  /* ── MODAL SECTION DIVIDER ── */
+  .modal-section-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: #6366f1; padding: 8px 0 4px; border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 4px; display: flex; align-items: center; gap: 7px;
+  }
+
 </style>
 </head>
 <body>
@@ -471,9 +516,15 @@
       <div class="nav-sub-item" onclick="showView('linkedin-list')"><i class="bi bi-linkedin"></i> LinkedIn AC</div>
       <div class="nav-sub-item" onclick="showView('teams-list')"><i class="bi bi-microsoft-teams"></i> Teams AC</div>
       <div class="nav-sub-item" onclick="showView('telegram-list')"><i class="bi bi-telegram"></i> Telegram AC</div>
+      <div class="nav-sub-item" onclick="showView('gmail-list')"><i class="bi bi-envelope-fill"></i> Gmail AC</div>
     </div>
 
-    <!-- 3. Business Advertiser -->
+    <!-- 3. Social Media Accounts -->
+    <div class="nav-item-parent" data-label="Social Media Accounts" onclick="showView('socialmedia-list')">
+      <i class="bi bi-share nav-icon"></i> <span class="nav-label">Social Media Accounts</span>
+    </div>
+
+    <!-- 4. Business Advertiser -->
     <div class="nav-item-parent" data-label="Business Advertiser" onclick="showView('advertiser-list')">
       <i class="bi bi-megaphone nav-icon"></i> <span class="nav-label">Business Advertiser</span>
     </div>
@@ -521,6 +572,10 @@
         <li class="breadcrumb-item active">Overview</li>
       </ol></nav>
     </div>
+    <button class="btn-topbar-logout d-lg-none" onclick="alert('Logged out!')" title="Logout">
+      <i class="bi bi-box-arrow-left"></i>
+      <span>Logout</span>
+    </button>
   </div>
 
   <div class="content-area">
@@ -1073,6 +1128,152 @@
       </div>
     </div>
 
+    <!-- ═══ VIEW: GMAIL LIST (Cards) ═══ -->
+    <div class="view-panel" id="view-gmail-list">
+      <div class="card-view-wrapper">
+        <div class="card-view-topbar">
+          <h6><i class="bi bi-envelope-fill me-2" style="color:#ea4335;"></i>Gmail Account List</h6>
+          <button class="btn-add-main" onclick="openModal('modal-gmail')"><i class="bi bi-plus-lg"></i> Add New</button>
+        </div>
+        <div class="cards-grid">
+          <div class="data-card">
+            <div class="data-card-header">
+              <div><p class="card-title">Rahul Sharma</p><p class="card-sub">rahul.sharma@gmail.com</p></div>
+              <div class="card-actions"><button class="btn-edit" onclick="openModal('modal-gmail')"><i class="bi bi-pencil"></i> Edit</button><button class="btn-del" onclick="confirmDelete(this)"><i class="bi bi-trash"></i></button></div>
+            </div>
+            <div class="data-card-body">
+              <div class="card-field"><span class="cf-label">Gmail ID</span><span class="cf-value">rahul.sharma@gmail.com</span></div>
+              <div class="card-field"><span class="cf-label">Password</span><span class="cf-value pw-mask">••••••••</span></div>
+              <div class="card-field"><span class="cf-label">Phone Number</span><span class="cf-value">+91 98765 43210</span></div>
+              <div class="card-field"><span class="cf-label">Recovery Mail</span><span class="cf-value">rahul.backup@yahoo.com</span></div>
+            </div>
+            <div class="data-card-footer"><span class="badge-status badge-active">2FA ON</span></div>
+          </div>
+          <div class="data-card">
+            <div class="data-card-header">
+              <div><p class="card-title">Priya Patel</p><p class="card-sub">priya.patel@gmail.com</p></div>
+              <div class="card-actions"><button class="btn-edit" onclick="openModal('modal-gmail')"><i class="bi bi-pencil"></i> Edit</button><button class="btn-del" onclick="confirmDelete(this)"><i class="bi bi-trash"></i></button></div>
+            </div>
+            <div class="data-card-body">
+              <div class="card-field"><span class="cf-label">Gmail ID</span><span class="cf-value">priya.patel@gmail.com</span></div>
+              <div class="card-field"><span class="cf-label">Password</span><span class="cf-value pw-mask">••••••••</span></div>
+              <div class="card-field"><span class="cf-label">Phone Number</span><span class="cf-value">+91 99887 76655</span></div>
+              <div class="card-field"><span class="cf-label">Recovery Mail</span><span class="cf-value">priya.recovery@outlook.com</span></div>
+            </div>
+            <div class="data-card-footer"><span class="badge-status badge-inactive">2FA OFF</span></div>
+          </div>
+          <div class="data-card">
+            <div class="data-card-header">
+              <div><p class="card-title">Amit Verma</p><p class="card-sub">amit.verma.work@gmail.com</p></div>
+              <div class="card-actions"><button class="btn-edit" onclick="openModal('modal-gmail')"><i class="bi bi-pencil"></i> Edit</button><button class="btn-del" onclick="confirmDelete(this)"><i class="bi bi-trash"></i></button></div>
+            </div>
+            <div class="data-card-body">
+              <div class="card-field"><span class="cf-label">Gmail ID</span><span class="cf-value">amit.verma.work@gmail.com</span></div>
+              <div class="card-field"><span class="cf-label">Password</span><span class="cf-value pw-mask">••••••••</span></div>
+              <div class="card-field"><span class="cf-label">Phone Number</span><span class="cf-value">+91 91234 56789</span></div>
+              <div class="card-field"><span class="cf-label">Recovery Mail</span><span class="cf-value">amit.personal@gmail.com</span></div>
+            </div>
+            <div class="data-card-footer"><span class="badge-status badge-active">2FA ON</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: SOCIAL MEDIA ACCOUNTS (Cards) ═══ -->
+    <div class="view-panel" id="view-socialmedia-list">
+      <div class="card-view-wrapper">
+        <div class="card-view-topbar">
+          <h6><i class="bi bi-share me-2" style="color:#6366f1;"></i>Social Media Accounts</h6>
+          <button class="btn-add-main" onclick="openModal('modal-socialmedia')"><i class="bi bi-plus-lg"></i> Add New</button>
+        </div>
+        <div class="cards-grid">
+
+          <!-- Card 1: All 3 platforms present -->
+          <div class="data-card">
+            <div class="data-card-header">
+              <div><p class="card-title">TechVentures Pvt</p><p class="card-sub">techventures.com</p></div>
+              <div class="card-actions"><button class="btn-edit" onclick="openModal('modal-socialmedia')"><i class="bi bi-pencil"></i> Edit</button><button class="btn-del" onclick="confirmDelete(this)"><i class="bi bi-trash"></i></button></div>
+            </div>
+            <div class="data-card-body">
+              <div class="card-field"><span class="cf-label">Domain</span><span class="cf-value">techventures.com</span></div>
+              <div class="card-field"><span class="cf-label">Company</span><span class="cf-value">TechVentures Pvt Ltd</span></div>
+              <!-- LinkedIn: YES -->
+              <div class="sm-platform-block sm-block-linkedin">
+                <div class="sm-platform-header"><span class="sm-platform-badge sm-badge-linkedin"><i class="bi bi-linkedin"></i> LinkedIn</span><span class="sm-has-badge yes">Yes</span></div>
+                <div class="card-field ms-2"><span class="cf-label">Page Name</span><span class="cf-value">TechVentures Official</span></div>
+                <div class="card-field ms-2"><span class="cf-label">Password</span><span class="cf-value pw-mask">••••••••</span></div>
+              </div>
+              <!-- Instagram: YES -->
+              <div class="sm-platform-block sm-block-instagram">
+                <div class="sm-platform-header"><span class="sm-platform-badge sm-badge-instagram"><i class="bi bi-instagram"></i> Instagram</span><span class="sm-has-badge yes">Yes</span></div>
+                <div class="card-field ms-2"><span class="cf-label">Account Name</span><span class="cf-value">@techventures_ig</span></div>
+                <div class="card-field ms-2"><span class="cf-label">Password</span><span class="cf-value pw-mask">••••••••</span></div>
+              </div>
+              <!-- Facebook: YES -->
+              <div class="sm-platform-block sm-block-facebook">
+                <div class="sm-platform-header"><span class="sm-platform-badge sm-badge-facebook"><i class="bi bi-facebook"></i> Facebook</span><span class="sm-has-badge yes">Yes</span></div>
+                <div class="card-field ms-2"><span class="cf-label">Page Name</span><span class="cf-value">TechVentures Pvt Ltd</span></div>
+                <div class="card-field ms-2"><span class="cf-label">Password</span><span class="cf-value pw-mask">••••••••</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: LinkedIn No, Instagram Yes, Facebook No -->
+          <div class="data-card">
+            <div class="data-card-header">
+              <div><p class="card-title">Digital Market Hub</p><p class="card-sub">digitalmarkethub.net</p></div>
+              <div class="card-actions"><button class="btn-edit" onclick="openModal('modal-socialmedia')"><i class="bi bi-pencil"></i> Edit</button><button class="btn-del" onclick="confirmDelete(this)"><i class="bi bi-trash"></i></button></div>
+            </div>
+            <div class="data-card-body">
+              <div class="card-field"><span class="cf-label">Domain</span><span class="cf-value">digitalmarkethub.net</span></div>
+              <div class="card-field"><span class="cf-label">Company</span><span class="cf-value">Digital Market Hub</span></div>
+              <!-- LinkedIn: NO -->
+              <div class="sm-platform-block sm-block-linkedin">
+                <div class="sm-platform-header"><span class="sm-platform-badge sm-badge-linkedin"><i class="bi bi-linkedin"></i> LinkedIn</span><span class="sm-has-badge no">No</span></div>
+              </div>
+              <!-- Instagram: YES -->
+              <div class="sm-platform-block sm-block-instagram">
+                <div class="sm-platform-header"><span class="sm-platform-badge sm-badge-instagram"><i class="bi bi-instagram"></i> Instagram</span><span class="sm-has-badge yes">Yes</span></div>
+                <div class="card-field ms-2"><span class="cf-label">Account Name</span><span class="cf-value">@dmhub_official</span></div>
+                <div class="card-field ms-2"><span class="cf-label">Password</span><span class="cf-value pw-mask">••••••••</span></div>
+              </div>
+              <!-- Facebook: NO -->
+              <div class="sm-platform-block sm-block-facebook">
+                <div class="sm-platform-header"><span class="sm-platform-badge sm-badge-facebook"><i class="bi bi-facebook"></i> Facebook</span><span class="sm-has-badge no">No</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: All No -->
+          <div class="data-card">
+            <div class="data-card-header">
+              <div><p class="card-title">Cloud Solutions</p><p class="card-sub">cloudsolutions.io</p></div>
+              <div class="card-actions"><button class="btn-edit" onclick="openModal('modal-socialmedia')"><i class="bi bi-pencil"></i> Edit</button><button class="btn-del" onclick="confirmDelete(this)"><i class="bi bi-trash"></i></button></div>
+            </div>
+            <div class="data-card-body">
+              <div class="card-field"><span class="cf-label">Domain</span><span class="cf-value">cloudsolutions.io</span></div>
+              <div class="card-field"><span class="cf-label">Company</span><span class="cf-value">Cloud Solutions Inc</span></div>
+              <!-- LinkedIn: NO -->
+              <div class="sm-platform-block sm-block-linkedin">
+                <div class="sm-platform-header"><span class="sm-platform-badge sm-badge-linkedin"><i class="bi bi-linkedin"></i> LinkedIn</span><span class="sm-has-badge no">No</span></div>
+              </div>
+              <!-- Instagram: NO -->
+              <div class="sm-platform-block sm-block-instagram">
+                <div class="sm-platform-header"><span class="sm-platform-badge sm-badge-instagram"><i class="bi bi-instagram"></i> Instagram</span><span class="sm-has-badge no">No</span></div>
+              </div>
+              <!-- Facebook: YES -->
+              <div class="sm-platform-block sm-block-facebook">
+                <div class="sm-platform-header"><span class="sm-platform-badge sm-badge-facebook"><i class="bi bi-facebook"></i> Facebook</span><span class="sm-has-badge yes">Yes</span></div>
+                <div class="card-field ms-2"><span class="cf-label">Page Name</span><span class="cf-value">Cloud Solutions Official</span></div>
+                <div class="card-field ms-2"><span class="cf-label">Password</span><span class="cf-value pw-mask">••••••••</span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <!-- ═══ VIEW: ADVERTISER LIST (Cards) ═══ -->
     <div class="view-panel" id="view-advertiser-list">
       <div class="card-view-wrapper">
@@ -1534,6 +1735,79 @@
   </div></div>
 </div>
 
+<!-- Gmail -->
+<div class="modal fade" id="modal-gmail" tabindex="-1">
+  <div class="modal-dialog modal-dialog-scrollable"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-envelope-fill me-2" style="color:#ea4335;"></i>Add / Edit Gmail Account</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body"><div class="row g-3">
+      <div class="col-12"><label class="form-label">Gmail ID</label><input type="email" class="form-control" placeholder="example@gmail.com"></div>
+      <div class="col-12"><label class="form-label">Password</label><input type="password" class="form-control"></div>
+      <div class="col-12"><label class="form-label">Phone Number</label><input type="tel" class="form-control" placeholder="+91 00000 00000"></div>
+      <div class="col-12"><label class="form-label">Recovery Mail</label><input type="email" class="form-control" placeholder="recovery@example.com"></div>
+    </div></div>
+    <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary">Save Account</button></div>
+  </div></div>
+</div>
+
+<!-- Social Media Accounts -->
+<div class="modal fade" id="modal-socialmedia" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title"><i class="bi bi-share me-2 text-primary"></i>Add / Edit Social Media Account</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <div class="row g-3">
+        <!-- Basic Info -->
+        <div class="col-12"><div class="modal-section-title"><i class="bi bi-info-circle"></i> Basic Info</div></div>
+        <div class="col-md-6"><label class="form-label">Domain Name</label><input type="text" class="form-control" placeholder="e.g. techventures.com"></div>
+        <div class="col-md-6"><label class="form-label">Company Name</label><input type="text" class="form-control" placeholder="e.g. TechVentures Pvt Ltd"></div>
+
+        <!-- LinkedIn -->
+        <div class="col-12"><div class="modal-section-title"><i class="bi bi-linkedin" style="color:#0a66c2;"></i> LinkedIn</div></div>
+        <div class="col-12">
+          <label class="form-label">Has LinkedIn Account?</label>
+          <div class="d-flex gap-3">
+            <div class="form-check"><input class="form-check-input" type="radio" name="sm-linkedin" id="li-yes" value="yes" onchange="toggleSmFields('linkedin',true)"><label class="form-check-label" for="li-yes">Yes</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="sm-linkedin" id="li-no" value="no" checked onchange="toggleSmFields('linkedin',false)"><label class="form-check-label" for="li-no">No</label></div>
+          </div>
+        </div>
+        <div id="sm-linkedin-fields" style="display:none;" class="col-12"><div class="row g-3">
+          <div class="col-md-6"><label class="form-label">LinkedIn Page Name</label><input type="text" class="form-control" placeholder="Page or Profile Name"></div>
+          <div class="col-md-6"><label class="form-label">Password</label><input type="password" class="form-control"></div>
+        </div></div>
+
+        <!-- Instagram -->
+        <div class="col-12"><div class="modal-section-title"><i class="bi bi-instagram" style="color:#c13584;"></i> Instagram</div></div>
+        <div class="col-12">
+          <label class="form-label">Has Instagram Account?</label>
+          <div class="d-flex gap-3">
+            <div class="form-check"><input class="form-check-input" type="radio" name="sm-instagram" id="ig-yes" value="yes" onchange="toggleSmFields('instagram',true)"><label class="form-check-label" for="ig-yes">Yes</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="sm-instagram" id="ig-no" value="no" checked onchange="toggleSmFields('instagram',false)"><label class="form-check-label" for="ig-no">No</label></div>
+          </div>
+        </div>
+        <div id="sm-instagram-fields" style="display:none;" class="col-12"><div class="row g-3">
+          <div class="col-md-6"><label class="form-label">Instagram Account Name</label><input type="text" class="form-control" placeholder="@username"></div>
+          <div class="col-md-6"><label class="form-label">Password</label><input type="password" class="form-control"></div>
+        </div></div>
+
+        <!-- Facebook -->
+        <div class="col-12"><div class="modal-section-title"><i class="bi bi-facebook" style="color:#1877f2;"></i> Facebook</div></div>
+        <div class="col-12">
+          <label class="form-label">Has Facebook Account?</label>
+          <div class="d-flex gap-3">
+            <div class="form-check"><input class="form-check-input" type="radio" name="sm-facebook" id="fb-yes" value="yes" onchange="toggleSmFields('facebook',true)"><label class="form-check-label" for="fb-yes">Yes</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="sm-facebook" id="fb-no" value="no" checked onchange="toggleSmFields('facebook',false)"><label class="form-check-label" for="fb-no">No</label></div>
+          </div>
+        </div>
+        <div id="sm-facebook-fields" style="display:none;" class="col-12"><div class="row g-3">
+          <div class="col-md-6"><label class="form-label">Facebook Page Name</label><input type="text" class="form-control" placeholder="Page Name"></div>
+          <div class="col-md-6"><label class="form-label">Password</label><input type="password" class="form-control"></div>
+        </div></div>
+
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary">Save Account</button></div>
+  </div></div>
+</div>
+
 <!-- Delete Confirm -->
 <div class="modal fade" id="modal-delete" tabindex="-1">
   <div class="modal-dialog modal-sm"><div class="modal-content">
@@ -1567,6 +1841,8 @@ const viewTitles = {
   'linkedin-list':  ['LinkedIn Accounts',     'Account Management > LinkedIn AC'],
   'teams-list':     ['Teams Accounts',        'Account Management > Teams AC'],
   'telegram-list':  ['Telegram Accounts',     'Account Management > Telegram AC'],
+  'gmail-list':     ['Gmail Accounts',        'Account Management > Gmail AC'],
+  'socialmedia-list':['Social Media Accounts','Social Media Accounts'],
   'advertiser-list':['Business Advertiser',   'Business Advertiser > Advertiser List'],
   'bank-list':      ['Bank Details',          'Bank Details > Bank List'],
   'sim-list':       ['SIM Card Details',      'SimCard Details > SIM List'],
@@ -1690,6 +1966,21 @@ function confirmDelete(btn) {
 document.getElementById('confirm-del-btn').addEventListener('click', function () {
   if (cardToDelete) { cardToDelete.remove(); cardToDelete = null; }
   bootstrap.Modal.getInstance(document.getElementById('modal-delete')).hide();
+});
+
+function toggleSmFields(platform, show) {
+  const el = document.getElementById('sm-' + platform + '-fields');
+  if (el) el.style.display = show ? 'block' : 'none';
+}
+
+document.getElementById('modal-socialmedia').addEventListener('show.bs.modal', function () {
+  ['linkedin','instagram','facebook'].forEach(p => {
+    const el = document.getElementById('sm-' + p + '-fields');
+    if (el) el.style.display = 'none';
+  });
+  document.getElementById('li-no').checked = true;
+  document.getElementById('ig-no').checked = true;
+  document.getElementById('fb-no').checked = true;
 });
 </script>
 </body>
