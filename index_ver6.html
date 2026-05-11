@@ -7,6 +7,7 @@
   <title>Admin Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
     :root {
       --sidebar-bg: #0f172a;
@@ -654,6 +655,21 @@
       gap: 6px;
       flex-shrink: 0;
       margin-left: 8px;
+    }
+
+    .btn-view {
+      background: #e0e7ff;
+      border: none;
+      color: #4338ca;
+      border-radius: 6px;
+      padding: 5px 11px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .btn-view:hover {
+      background: #c7d2fe;
     }
 
     .btn-edit {
@@ -1506,6 +1522,91 @@
       align-items: center;
       gap: 7px;
     }
+
+    .modern-flatpickr {
+      height: 52px;
+      border-radius: 14px;
+      border: 1px solid #dfe3ea;
+      padding: 0 16px;
+      font-weight: 500;
+    }
+
+    /* Global Modern Form Styling */
+
+.form-control,
+.form-select {
+  height: 50px;
+  border-radius: 14px;
+  border: 1px solid #d6dbe4;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1e293b;
+  background-color: #fff;
+
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+/* Focus Effect */
+.form-control:focus,
+.form-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+/* Placeholder */
+.form-control::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* Textarea */
+textarea.form-control {
+  min-height: 120px;
+  padding-top: 14px;
+  resize: vertical;
+}
+
+/* File Input */
+input[type="file"].form-control {
+  padding: 10px 14px;
+}
+
+/* Labels */
+.form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+/* Modal spacing improvement */
+.modal-body .row.g-3 {
+  --bs-gutter-y: 1.4rem;
+}
+
+/* Optional modern modal look */
+.modal-content {
+  border: none;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #eef2f7;
+}
+    
   </style>
 </head>
 
@@ -1539,15 +1640,15 @@
       <div class="sidebar-section-label">Navigation</div>
 
       <!-- 1. Domains Overview -->
-      <div class="nav-item-parent" data-label="Domains Overview" onclick="toggleMenu(this,'sub-domains')">
-        <i class="bi bi-globe nav-icon"></i> <span class="nav-label">Domains Overview</span>
-        <i class="bi bi-chevron-right chevron"></i>
+      <div class="nav-item-parent" data-label="Domains Overview" onclick="showView('overview')">
+        <i class="bi bi-kanban nav-icon"></i> <span class="nav-label">Dashboard</span>
+        </i>
       </div>
-      <div class="nav-submenu" id="sub-domains">
+      <!-- <div class="nav-submenu" id="sub-domains">
         <div class="nav-sub-item" onclick="showView('overview')"><i class="bi bi-bar-chart-line"></i> Overview</div>
         <div class="nav-sub-item" onclick="showView('upcoming')"><i class="bi bi-clock-history"></i> Upcoming Expiries
         </div>
-      </div>
+      </div> -->
 
       <!-- 2. Account Management -->
       <div class="nav-item-parent" data-label="Account Management" onclick="toggleMenu(this,'sub-accounts')">
@@ -1586,7 +1687,7 @@
 
       <!-- 4. Bank Details -->
       <div class="nav-item-parent" data-label="Bank Details" onclick="showView('bank-list')">
-        <i class="bi bi-bank nav-icon"></i> <span class="nav-label">Bank Details</span>
+        <i class="bi bi-bank nav-icon"></i> <span class="nav-label">Company & Bank Details</span>
       </div>
 
       <!-- 5. SimCard Details -->
@@ -1595,9 +1696,9 @@
       </div>
 
       <!-- 6. Company -->
-      <div class="nav-item-parent" data-label="Company" onclick="showView('company-list')">
+      <!-- <div class="nav-item-parent" data-label="Company" onclick="showView('company-list')">
         <i class="bi bi-building nav-icon"></i> <span class="nav-label">Company</span>
-      </div>
+      </div> -->
 
       <!-- 7. Assets Management (NEW) -->
       <div class="nav-item-parent" data-label="Assets Management" onclick="showView('assets-list')">
@@ -1621,11 +1722,11 @@
         <i class="bi bi-list"></i>
       </button>
       <div>
-        <h5 id="page-title">Domains Overview</h5>
+        <h5 id="page-title">Dashboard</h5>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb mb-0" id="breadcrumb">
             <li class="breadcrumb-item"><a href="javascript:void(0)" onclick="showView('overview')">Home</a></li>
-            <li class="breadcrumb-item active">Overview</li>
+            <li class="breadcrumb-item active">Dashboard</li>
           </ol>
         </nav>
       </div>
@@ -1669,164 +1770,6 @@
             </div>
           </div>
         </div>
-        <div class="overview-accordion">
-          <div class="acc-item">
-            <div class="acc-header" onclick="toggleAcc(this)">
-              <div class="d-flex align-items-center gap-3"><i
-                  class="bi bi-globe2 text-primary"></i><span>techventures.com</span><span
-                  class="domain-tag">Active</span></div>
-              <i class="bi bi-chevron-down"></i>
-            </div>
-            <div class="acc-body">
-              <div class="detail-section">
-                <h6><i class="bi bi-hdd-network me-1"></i>Domain Details</h6>
-                <div class="detail-grid">
-                  <div class="detail-field">
-                    <div class="df-label">Provider</div>
-                    <div class="df-value">GoDaddy</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Expiry Date</div>
-                    <div class="df-value">2025-12-31</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Registrar Email</div>
-                    <div class="df-value">admin@techventures.com</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Privacy Protection</div>
-                    <div class="df-value">Enabled</div>
-                  </div>
-                </div>
-              </div>
-              <div class="detail-section">
-                <h6><i class="bi bi-server me-1"></i>Server Details</h6>
-                <div class="detail-grid">
-                  <div class="detail-field">
-                    <div class="df-label">Server Name</div>
-                    <div class="df-value">SRV-US-01</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Type</div>
-                    <div class="df-value">VPS</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Expiry Date</div>
-                    <div class="df-value">2025-09-15</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Provider</div>
-                    <div class="df-value">DigitalOcean</div>
-                  </div>
-                </div>
-              </div>
-              <div class="detail-section">
-                <h6><i class="bi bi-envelope-at me-1"></i>Webmail Details</h6>
-                <div class="detail-grid">
-                  <div class="detail-field">
-                    <div class="df-label">Webmail</div>
-                    <div class="df-value">info@techventures.com</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Domain</div>
-                    <div class="df-value">techventures.com</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Login Link</div>
-                    <div class="df-value text-primary">webmail.techventures.com</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="acc-item">
-            <div class="acc-header" onclick="toggleAcc(this)">
-              <div class="d-flex align-items-center gap-3"><i
-                  class="bi bi-globe2 text-primary"></i><span>digitalmarkethub.net</span><span class="domain-tag"
-                  style="background:#fef9c3;color:#854d0e;">Expiring Soon</span></div>
-              <i class="bi bi-chevron-down"></i>
-            </div>
-            <div class="acc-body">
-              <div class="detail-section">
-                <h6><i class="bi bi-hdd-network me-1"></i>Domain Details</h6>
-                <div class="detail-grid">
-                  <div class="detail-field">
-                    <div class="df-label">Provider</div>
-                    <div class="df-value">Namecheap</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Expiry Date</div>
-                    <div class="df-value text-danger">2024-08-10</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Email</div>
-                    <div class="df-value">registrar@dmhub.net</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Privacy</div>
-                    <div class="df-value">Disabled</div>
-                  </div>
-                </div>
-              </div>
-              <div class="detail-section">
-                <h6><i class="bi bi-server me-1"></i>Server Details</h6>
-                <div class="detail-grid">
-                  <div class="detail-field">
-                    <div class="df-label">Server Name</div>
-                    <div class="df-value">SRV-EU-03</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Type</div>
-                    <div class="df-value">Shared</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Expiry Date</div>
-                    <div class="df-value">2025-02-28</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Provider</div>
-                    <div class="df-value">Hostinger</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="acc-item">
-            <div class="acc-header" onclick="toggleAcc(this)">
-              <div class="d-flex align-items-center gap-3"><i
-                  class="bi bi-globe2 text-primary"></i><span>cloudsolutions.io</span><span
-                  class="domain-tag">Active</span></div>
-              <i class="bi bi-chevron-down"></i>
-            </div>
-            <div class="acc-body">
-              <div class="detail-section">
-                <h6><i class="bi bi-hdd-network me-1"></i>Domain Details</h6>
-                <div class="detail-grid">
-                  <div class="detail-field">
-                    <div class="df-label">Provider</div>
-                    <div class="df-value">Cloudflare</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Expiry Date</div>
-                    <div class="df-value">2026-03-20</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Email</div>
-                    <div class="df-value">ops@cloudsolutions.io</div>
-                  </div>
-                  <div class="detail-field">
-                    <div class="df-label">Privacy</div>
-                    <div class="df-value">Enabled</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ═══ VIEW: UPCOMING EXPIRIES ═══ -->
-      <div class="view-panel" id="view-upcoming">
         <div class="row g-4">
           <div class="col-12">
             <div class="table-container">
@@ -1932,6 +1875,7 @@
           </div>
         </div>
       </div>
+
 
       <!-- ═══ VIEW: DOMAIN AC LIST (Cards) ═══ -->
       <div class="view-panel" id="view-domainac-list">
@@ -3124,7 +3068,7 @@
       </div>
 
       <!-- ═══ VIEW: COMPANY LIST (Cards) ═══ -->
-      <div class="view-panel" id="view-company-list">
+      <!-- <div class="view-panel" id="view-company-list">
         <div class="card-view-wrapper">
           <div class="card-view-topbar">
             <h6><i class="bi bi-building me-2 text-secondary"></i>Company List</h6>
@@ -3182,7 +3126,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- ═══ VIEW: ASSETS MANAGEMENT (Cards) — NEW ═══ -->
       <div class="view-panel" id="view-assets-list">
@@ -3564,79 +3508,348 @@
 
   <!-- Advertiser -->
   <div class="modal fade" id="modal-advertiser" tabindex="-1">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Add / Edit Advertiser</h5><button type="button" class="btn-close"
-            data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row g-3">
-            <div class="col-md-6"><label class="form-label">Advertiser Name</label><input type="text"
-                class="form-control"></div>
-            <div class="col-md-6"><label class="form-label">Company</label><input type="text" class="form-control">
-            </div>
-            <div class="col-md-6"><label class="form-label">Country</label><select class="form-select">
-                <option>India</option>
-                <option>USA</option>
-                <option>UK</option>
-                <option>UAE</option>
-              </select></div>
-            <div class="col-md-6"><label class="form-label">Mobile No.</label><input type="tel" class="form-control">
-            </div>
-            <div class="col-md-6"><label class="form-label">Email</label><input type="email" class="form-control"></div>
-            <div class="col-md-6"><label class="form-label">Login URL</label><input type="url" class="form-control">
-            </div>
-            <div class="col-md-6"><label class="form-label">Login ID</label><input type="text" class="form-control">
-            </div>
-            <div class="col-md-6"><label class="form-label">Password</label><input type="password" class="form-control">
-            </div>
-            <div class="col-md-6"><label class="form-label">Teams ID</label><input type="text" class="form-control">
-            </div>
-            <div class="col-md-6"><label class="form-label">Telegram ID</label><input type="text" class="form-control">
-            </div>
-            <div class="col-md-6"><label class="form-label">Payment Term</label><select class="form-select">
-                <option>Net-7</option>
-                <option>Net-15</option>
-                <option>Net-30</option>
-                <option>Net-45</option>
-                <option>Net-60</option>
-              </select></div>
-            <div class="col-md-6"><label class="form-label">Threshold (₹)</label><input type="number"
-                class="form-control"></div>
-            <div class="col-12"><label class="form-label">Company Address</label><textarea class="form-control"
-                rows="3"></textarea></div>
-          </div>
-        </div>
-        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button
-            class="btn btn-primary">Save Advertiser</button></div>
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Add / Edit Advertiser</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+
+          <!-- Date Input -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Date</label>
+            <input type="text" class="form-control modern-flatpickr" placeholder="Select Date">
+          </div>
+
+          <!-- Advertiser Name -->
+          <div class="col-md-4">
+            <label class="form-label">Advertiser Name</label>
+            <input type="text" class="form-control">
+          </div>
+
+          <!-- Manager -->
+          <div class="col-md-4">
+            <label class="form-label">Manager</label>
+            <input type="text" class="form-control">
+          </div>
+
+          <!-- Type -->
+          <div class="col-md-4">
+            <label class="form-label">Type</label>
+            <select class="form-select">
+              <option selected disabled>Select Type</option>
+              <option>Agency</option>
+              <option>Network</option>
+              <option>Affiliate</option>
+            </select>
+          </div>
+
+          <!-- Country -->
+          <div class="col-md-4">
+            <label class="form-label">Country</label>
+            <select class="form-select">
+              <option selected disabled>Select Country</option>
+              <option>India</option>
+              <option>USA</option>
+              <option>UK</option>
+              <option>UAE</option>
+              <option>Canada</option>
+            </select>
+          </div>
+
+          <!-- Grade -->
+          <div class="col-md-4">
+            <label class="form-label">Grade</label>
+            <select class="form-select">
+              <option selected disabled>Select Grade</option>
+              <option class="text-success">A</option>
+              <option class="text-primary">B</option>
+              <option class="text-warning">C</option>
+              <option class="text-danger">D</option>
+            </select>
+          </div>
+
+          <!-- AM -->
+          <div class="col-md-4">
+            <label class="form-label">AM</label>
+            <input type="text" class="form-control">
+          </div>
+
+          <!-- AM Skype -->
+          <div class="col-md-4">
+            <label class="form-label">AM - Skype</label>
+            <input type="text" class="form-control">
+          </div>
+
+          <!-- NET -->
+          <div class="col-md-4">
+            <label class="form-label">NET</label>
+            <select class="form-select">
+              <option selected disabled>Select NET</option>
+              <option>NET15</option>
+              <option>NET30</option>
+            </select>
+          </div>
+
+          <!-- Login -->
+          <div class="col-md-6">
+            <label class="form-label">Login URL</label>
+            <input type="url" class="form-control" placeholder="https://">
+          </div>
+
+          <!-- Username -->
+          <div class="col-md-3">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-control">
+          </div>
+
+          <!-- Password -->
+          <div class="col-md-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control">
+          </div>
+
+          <!-- Status -->
+          <div class="col-md-4">
+            <label class="form-label">Status</label>
+            <select class="form-select">
+              <option selected disabled>Select Status</option>
+              <option class="text-success">Active</option>
+              <option class="text-danger">Deactivated</option>
+              <option class="text-primary">Partially Activated</option>
+            </select>
+          </div>
+
+          <!-- Attachment -->
+          <div class="col-md-4">
+            <label class="form-label">Attachment</label>
+            <input type="file" class="form-control">
+          </div>
+
+          <!-- Finance Email -->
+          <div class="col-md-4">
+            <label class="form-label">Finance Email</label>
+            <input type="email" class="form-control">
+          </div>
+
+          <!-- Company Name -->
+          <div class="col-md-6">
+            <label class="form-label">Company Name</label>
+            <input type="text" class="form-control">
+          </div>
+
+          <!-- Beneficiary Name -->
+          <div class="col-md-6">
+            <label class="form-label">Beneficiary Name</label>
+            <input type="text" class="form-control">
+          </div>
+
+          <!-- Brand -->
+          <div class="col-md-6">
+            <label class="form-label">Brand</label>
+            <input type="text" class="form-control">
+          </div>
+
+          <!-- Sub Brand -->
+          <div class="col-md-6">
+            <label class="form-label">Sub Brand</label>
+            <input type="text" class="form-control">
+          </div>
+
+          <!-- Company Official Address -->
+          <div class="col-12">
+            <label class="form-label">Company Official Address</label>
+            <textarea class="form-control" rows="3"></textarea>
+          </div>
+
+          <!-- Comment -->
+          <div class="col-12">
+            <label class="form-label">Comment</label>
+            <textarea class="form-control" rows="4"></textarea>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+
+        <button class="btn btn-primary">
+          Save Advertiser
+        </button>
+      </div>
+
     </div>
   </div>
+</div>
 
   <!-- Bank -->
   <div class="modal fade" id="modal-bank" tabindex="-1">
-    <div class="modal-dialog modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Add / Edit Bank Account</h5><button type="button" class="btn-close"
-            data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row g-3">
-            <div class="col-12"><label class="form-label">Account Holder Name</label><input type="text"
-                class="form-control"></div>
-            <div class="col-12"><label class="form-label">Account Number</label><input type="number"
-                class="form-control"></div>
-            <div class="col-12"><label class="form-label">IFSC / SWIFT Code</label><input type="text"
-                class="form-control" placeholder="HDFC0001234 or SWIFT-XXXXXX"></div>
-          </div>
-        </div>
-        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button
-            class="btn btn-primary">Save Details</button></div>
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Add / Edit Bank Account</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+
+          <!-- Company Details -->
+          <div class="col-md-6">
+            <label class="form-label">Company Name</label>
+            <input type="text" class="form-control" name="company_name">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Bank Name</label>
+            <input type="text" class="form-control" name="bank_name">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Account Holder Name</label>
+            <input type="text" class="form-control" name="account_holder_name">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Account Number</label>
+            <input type="number" class="form-control" name="account_number">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">IFSC Code</label>
+            <input type="text" class="form-control" name="ifsc_code">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">SWIFT Code</label>
+            <input type="text" class="form-control" name="swift_code">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">IBAN Code</label>
+            <input type="text" class="form-control" name="iban_code">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Branch</label>
+            <input type="text" class="form-control" name="branch">
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label">Bank Address</label>
+            <textarea class="form-control" rows="2" name="bank_address"></textarea>
+          </div>
+
+          <!-- Personal Details -->
+          <div class="col-md-12">
+            <label class="form-label">Home Address</label>
+            <textarea class="form-control" rows="2" name="home_address"></textarea>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Email ID</label>
+            <input type="email" class="form-control" name="email">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" class="form-control" name="phone_number">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Country</label>
+            <select class="form-select" name="country">
+              <option value="">Select Country</option>
+              <option value="India">India</option>
+              <option value="USA">USA</option>
+              <option value="UK">UK</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Currency</label>
+            <select class="form-select" name="currency">
+              <option value="">Select Currency</option>
+              <option value="INR">INR</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Account Type</label>
+            <select class="form-select" name="account_type">
+              <option value="">Select Account Type</option>
+              <option value="Savings">Savings</option>
+              <option value="Current">Current</option>
+            </select>
+          </div>
+
+          <!-- File Uploads -->
+          <div class="col-md-6">
+            <label class="form-label">W8 Form</label>
+            <input type="file" class="form-control" name="w8_form">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">W9 Form</label>
+            <input type="file" class="form-control" name="w9_form">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">GST Certificate</label>
+            <input type="file" class="form-control" name="gst_certificate">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Tax Certificate</label>
+            <input type="file" class="form-control" name="tax_certificate">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">PAN Card</label>
+            <input type="file" class="form-control" name="pan_card">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Aadhar Card</label>
+            <input type="file" class="form-control" name="aadhar_card">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Udyam Card</label>
+            <input type="file" class="form-control" name="udyam_card">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Incorporation Certificate</label>
+            <input type="file" class="form-control" name="incorporation_certificate">
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+
+        <button class="btn btn-primary">
+          Save Details
+        </button>
+      </div>
+
     </div>
   </div>
+</div>
 
   <!-- SIM -->
   <div class="modal fade" id="modal-sim" tabindex="-1">
@@ -3910,11 +4123,21 @@
     </div>
   </div>
 
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+  flatpickr(".modern-flatpickr", {
+      dateFormat: "d M Y",
+      allowInput: true
+  });
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     const viewTitles = {
-      'overview': ['Domains Overview', 'Domains Overview > Overview'],
-      'upcoming': ['Upcoming Expiries', 'Domains Overview > Upcoming Expiries'],
+      'overview': ['Dashboard', 'Dashboard'],
+      // 'upcoming': ['Upcoming Expiries', 'Domains Overview > Upcoming Expiries'],
       'domainac-list': ['Domain AC List', 'Account Management > Domain AC > Domain AC List'],
       'domain-list': ['Domain List', 'Account Management > Domain AC > Domain List'],
       'domain-company-wise': ['Domain List Company Wise', 'Account Management > Domain AC > Domain List Company Wise'],
