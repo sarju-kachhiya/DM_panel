@@ -3666,7 +3666,7 @@ input[type="file"].form-control {
                 <tbody>
                   <tr>
                     <td>1</td><td>Rahul Sharma</td><td>Sr. Developer</td><td>Development</td>
-                    <td><span class="badge-status badge-active">In</span></td>
+                    <td><span class="badge-status badge-active">Active</span></td>
                     <td>2022-03-01</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('employee',0)"><i class="bi bi-eye"></i></button>
@@ -3676,7 +3676,7 @@ input[type="file"].form-control {
                   </tr>
                   <tr>
                     <td>2</td><td>Priya Patel</td><td>Marketing Manager</td><td>Affiliate Marketing</td>
-                    <td><span class="badge-status badge-active">In</span></td>
+                    <td><span class="badge-status badge-active">Active</span></td>
                     <td>2021-07-15</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('employee',1)"><i class="bi bi-eye"></i></button>
@@ -3686,7 +3686,7 @@ input[type="file"].form-control {
                   </tr>
                   <tr>
                     <td>3</td><td>Amit Verma</td><td>BDE</td><td>Sales</td>
-                    <td><span class="badge-status badge-inactive">Out</span></td>
+                    <td><span class="badge-status badge-inactive">Inactive</span></td>
                     <td>2020-11-10</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('employee',2)"><i class="bi bi-eye"></i></button>
@@ -4919,7 +4919,7 @@ input[type="file"].form-control {
             <!-- ── General Information ── -->
             <div class="col-12"><div class="modal-section-title"><i class="bi bi-person-lines-fill me-1"></i>General Information</div></div>
             <div class="col-md-6"><div class="form-label-row"><label class="form-label">Employee Name</label><button type="button" class="field-info-btn" tabindex="-1"><i class="bi bi-info-circle-fill"></i><span class="info-tooltip">Full legal name of the employee</span></button></div><input type="text" class="form-control" placeholder="Full Name"></div>
-            <div class="col-md-6"><div class="form-label-row"><label class="form-label">Status</label><button type="button" class="field-info-btn" tabindex="-1"><i class="bi bi-info-circle-fill"></i><span class="info-tooltip">Current employment status of the employee</span></button></div><select class="form-select"><option>In</option><option>Out</option></select></div>
+            <div class="col-md-6"><div class="form-label-row"><label class="form-label">Status</label><button type="button" class="field-info-btn" tabindex="-1"><i class="bi bi-info-circle-fill"></i><span class="info-tooltip">Current employment status of the employee</span></button></div><select class="form-select"><option>Active</option><option>Inactive</option></select></div>
             <div class="col-md-6"><div class="form-label-row"><label class="form-label">Tag</label><button type="button" class="field-info-btn" tabindex="-1"><i class="bi bi-info-circle-fill"></i><span class="info-tooltip">Skill tag or specialisation label for the employee</span></button></div><select class="form-select"><option>Aff. Marketing</option><option>Sales</option><option>Email Marketing</option><option>SEO</option><option>Social Media</option><option>Flutter</option><option>BDE</option><option>iOS</option><option>Android</option></select></div>
             <div class="col-12"><div class="form-label-row"><label class="form-label">Address</label><button type="button" class="field-info-btn" tabindex="-1"><i class="bi bi-info-circle-fill"></i><span class="info-tooltip">Current residential address of the employee</span></button></div><input type="text" class="form-control" placeholder="Full Address"></div>
             <div class="col-12"><div class="form-label-row"><label class="form-label">Notes</label><button type="button" class="field-info-btn" tabindex="-1"><i class="bi bi-info-circle-fill"></i><span class="info-tooltip">Any extra information or remarks about the employee</span></button></div><textarea class="form-control" rows="3" placeholder="Additional notes..."></textarea></div>
@@ -4938,9 +4938,7 @@ input[type="file"].form-control {
 
             <!-- ── Salary Information ── -->
             <div class="col-12"><div class="modal-section-title mt-2"><i class="bi bi-cash-stack me-1"></i>Salary Information</div></div>
-            <div class="col-md-4"><div class="form-label-row"><label class="form-label">Salary 0</label><button type="button" class="field-info-btn" tabindex="-1"><i class="bi bi-info-circle-fill"></i><span class="info-tooltip">Initial/base salary (CTC per month)</span></button></div><input type="number" class="form-control" placeholder="0"></div>
-            <div class="col-md-4"><div class="form-label-row"><label class="form-label">Salary 1</label><button type="button" class="field-info-btn" tabindex="-1"><i class="bi bi-info-circle-fill"></i><span class="info-tooltip">Revised salary after first increment</span></button></div><input type="number" class="form-control" placeholder="0"></div>
-            <div class="col-md-4"><div class="form-label-row"><label class="form-label">Salary 2</label><button type="button" class="field-info-btn" tabindex="-1"><i class="bi bi-info-circle-fill"></i><span class="info-tooltip">Current or latest salary</span></button></div><input type="number" class="form-control" placeholder="0"></div>
+            <div class="col-md-4"><div class="form-label-row"><label class="form-label">Salary</label><button type="button" class="field-info-btn" tabindex="-1"><i class="bi bi-info-circle-fill"></i><span class="info-tooltip">Initial/base salary (CTC per month)</span></button></div><input type="number" class="form-control" placeholder="0"></div>
 
             <!-- ── Documents ── -->
             <div class="col-12"><div class="modal-section-title mt-2"><i class="bi bi-folder-fill me-1"></i>Documents</div></div>
