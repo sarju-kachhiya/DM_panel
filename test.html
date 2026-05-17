@@ -1797,6 +1797,94 @@ input[type="file"].form-control {
   padding: 20px 24px;
   border-top: 1px solid #eef2f7;
 }
+
+/* ── FULL-PAGE EDIT OVERLAY ── */
+#edit-page-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: #f1f5f9;
+  overflow-y: auto;
+}
+#edit-page-overlay.active { display: block; }
+
+.edit-page-topbar {
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-wrap: wrap;
+}
+.edit-page-topbar .ep-back {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+.edit-page-topbar .ep-back:hover { background: #e2e8f0; color: #1e293b; }
+.edit-page-topbar .ep-title-block h5 { margin: 0; font-size: 16px; font-weight: 700; color: #1e293b; }
+.edit-page-topbar .ep-breadcrumb { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+.edit-page-body { padding: 32px; max-width: 900px; margin: 0 auto; }
+.edit-page-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+.edit-page-card .ep-card-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fafbfc;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6366f1;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+.edit-page-card .ep-card-body { padding: 24px; }
+.edit-page-footer {
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+/* ── ACCOUNT MANAGEMENT TABS (matching asset tabs style) ── */
+#view-account-management .nav-tabs .nav-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+#view-account-management .nav-tabs .nav-link.active {
+  color: #6366f1;
+  border-bottom: 2px solid #6366f1;
+}
     
   </style>
 </head>
@@ -1805,6 +1893,26 @@ input[type="file"].form-control {
 
   <!-- Sidebar overlay — tap to close on mobile/tablet -->
   <div id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+  <!-- ═══════════════════════════════ FULL-PAGE EDIT OVERLAY ═══════════════════════════════ -->
+  <div id="edit-page-overlay">
+    <div class="edit-page-topbar">
+      <button class="ep-back" onclick="closeEditPage()"><i class="bi bi-arrow-left"></i> Back</button>
+      <div class="ep-title-block">
+        <h5 id="edit-page-title">Edit Record</h5>
+        <div class="ep-breadcrumb" id="edit-page-breadcrumb">Dashboard &rsaquo; Edit</div>
+      </div>
+    </div>
+    <div class="edit-page-body">
+      <div id="edit-page-content">
+        <!-- Dynamically populated based on type -->
+      </div>
+    </div>
+    <div class="edit-page-footer">
+      <button class="btn btn-light" onclick="closeEditPage()" style="border-radius:9px;font-weight:500;padding:10px 22px;">Discard Changes</button>
+      <button class="btn btn-primary" onclick="saveEditPage()" style="border-radius:9px;font-weight:600;padding:10px 24px;"><i class="bi bi-check-lg me-1"></i>Save Changes</button>
+    </div>
+  </div>
 
   <!-- ═══════════════════════════════ SIDEBAR ═══════════════════════════════ -->
   <div id="sidebar">
@@ -1828,7 +1936,7 @@ input[type="file"].form-control {
     </div>
 
     <div class="sidebar-nav-scroll">
-      <div class="sidebar-section-label">Navigation</div>
+      <div class="sidebar-section-label">Main Menu</div>
 
       <!-- 1. Domains Overview -->
       <div class="nav-item-parent" data-label="Domains Overview" onclick="showView('overview')">
@@ -1842,28 +1950,8 @@ input[type="file"].form-control {
       </div> -->
 
       <!-- 2. Account Management -->
-      <div class="nav-item-parent" data-label="Account Management" onclick="toggleMenu(this,'sub-accounts')">
+      <div class="nav-item-parent" data-label="Account Management" onclick="showView('account-management')">
         <i class="bi bi-person-workspace nav-icon"></i> <span class="nav-label">Account Management</span>
-        <i class="bi bi-chevron-right chevron"></i>
-      </div>
-      <div class="nav-submenu" id="sub-accounts">
-        <div class="nav-sub-item" onclick="toggleSubMenu(this,'sub-domainac')">
-          <i class="bi bi-hdd-network"></i> Domain AC
-          <i class="bi bi-chevron-right chevron ms-auto" style="font-size:10px;"></i>
-        </div>
-        <div class="nav-sub-submenu" id="sub-domainac">
-          <div class="nav-sub-sub-item" onclick="showView('domainac-list')"><i class="bi bi-list-ul"></i> Domain AC List
-          </div>
-          <!-- <div class="nav-sub-sub-item" onclick="showView('domain-list')"><i class="bi bi-dot"></i> Domain List</div> -->
-          <div class="nav-sub-sub-item" onclick="showView('domain-company-wise')"><i class="bi bi-building-check"></i> Domain List
-            Company Wise</div>
-        </div>
-        <div class="nav-sub-item" onclick="showView('server-list')"><i class="bi bi-server"></i> Server AC</div>
-        <div class="nav-sub-item" onclick="showView('webmail-list')"><i class="bi bi-envelope-at"></i> Webmail AC</div>
-        <div class="nav-sub-item" onclick="showView('linkedin-list')"><i class="bi bi-linkedin"></i> LinkedIn AC</div>
-        <div class="nav-sub-item" onclick="showView('teams-list')"><i class="bi bi-microsoft-teams"></i> Teams AC</div>
-        <div class="nav-sub-item" onclick="showView('telegram-list')"><i class="bi bi-telegram"></i> Telegram AC</div>
-        <div class="nav-sub-item" onclick="showView('gmail-list')"><i class="bi bi-envelope-fill"></i> Gmail AC</div>
       </div>
 
       <!-- 3. Social Media Accounts -->
@@ -1912,7 +2000,7 @@ input[type="file"].form-control {
 
     <!-- Logout — always pinned at bottom -->
     <div class="sidebar-logout">
-      <button class="btn-logout" onclick="alert('Logged out!')">
+      <button class="btn-logout" onclick="handleLogout()">
         <i class="bi bi-box-arrow-left"></i>
         <span class="logout-label">Logout</span>
       </button>
@@ -1926,7 +2014,7 @@ input[type="file"].form-control {
         <i class="bi bi-list"></i>
       </button>
       <div>
-        <h5 id="page-title">Dashboard</h5>
+        <h5 id="page-title">Dashboard Overview</h5>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb mb-0" id="breadcrumb">
             <li class="breadcrumb-item"><a href="javascript:void(0)" onclick="showView('overview')">Home</a></li>
@@ -1934,7 +2022,7 @@ input[type="file"].form-control {
           </ol>
         </nav>
       </div>
-      <button class="btn-topbar-logout d-lg-none" onclick="alert('Logged out!')" title="Logout">
+      <button class="btn-topbar-logout d-lg-none" onclick="handleLogout()" title="Logout">
         <i class="bi bi-box-arrow-left"></i>
         <span>Logout</span>
       </button>
@@ -1945,7 +2033,7 @@ input[type="file"].form-control {
       <!-- ═══ VIEW: OVERVIEW ═══ -->
       <div class="view-panel active" id="view-overview">
 
-        <!-- ── STATS ROW ── -->
+        <!-- ── ROW 1: KPI STAT CARDS ── -->
         <div class="row g-3 mb-4">
           <div class="col-6 col-lg-3">
             <div class="stat-card">
@@ -1969,37 +2057,74 @@ input[type="file"].form-control {
             </div>
           </div>
           <div class="col-6 col-lg-3">
-            <div class="stat-card">
-              <div class="label">Expiring in 30d</div>
+            <div class="stat-card" style="border-left:3px solid #ef4444;">
+              <div class="label" style="color:#ef4444;">Expiring in 30 Days</div>
               <div class="value text-danger">7</div>
-              <div class="sub">Needs attention</div>
+              <div class="sub">Requires immediate attention</div>
             </div>
           </div>
         </div>
 
-        <!-- ── SECTION LABEL ── -->
-        <div style="font-size:13px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#6366f1;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-          <i class="bi bi-bar-chart-line-fill"></i> Module Overview
+        <!-- ── ROW 2: Domain Status Chart + Upcoming Domain Renewals ── -->
+        <div class="row g-4 mb-4">
+          <div class="col-12 col-md-4">
+            <div class="table-container" style="padding:20px;height:100%;">
+              <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+                <i class="bi bi-pie-chart-fill text-primary"></i> Domain Status
+              </div>
+              <div style="position:relative;height:200px;display:flex;align-items:center;justify-content:center;">
+                <canvas id="chart-domain-pie"></canvas>
+              </div>
+              <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;justify-content:center;font-size:12px;">
+                <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:50%;background:#22c55e;display:inline-block;"></span>Active (38)</span>
+                <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>Expiring Soon (7)</span>
+                <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:50%;background:#ef4444;display:inline-block;"></span>Expired (3)</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-8">
+            <div class="table-container">
+              <div class="table-header">
+                <h6><i class="bi bi-globe2 me-2 text-primary"></i>Upcoming Domain Renewals</h6>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Domain Name</th><th>Provider</th><th>Expiry Date</th><th>Days Left</th><th>Email</th><th>Status</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>digitalmarkethub.net</td><td>Namecheap</td><td>2024-08-10</td><td><span class="expiry-badge expiry-critical">12 days</span></td><td>registrar@dmhub.net</td><td><span class="badge-status badge-pending">Renew Now</span></td></tr>
+                    <tr><td>adpros.co</td><td>GoDaddy</td><td>2024-08-25</td><td><span class="expiry-badge expiry-warning">27 days</span></td><td>admin@adpros.co</td><td><span class="badge-status badge-pending">Upcoming</span></td></tr>
+                    <tr><td>mediareach.org</td><td>Namecheap</td><td>2024-09-05</td><td><span class="expiry-badge expiry-warning">38 days</span></td><td>info@mediareach.org</td><td><span class="badge-status badge-pending">Upcoming</span></td></tr>
+                    <tr><td>techventures.com</td><td>GoDaddy</td><td>2025-12-31</td><td><span class="expiry-badge expiry-ok">520 days</span></td><td>admin@techventures.com</td><td><span class="badge-status badge-active">OK</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- ── NUMBER OVERVIEW CARDS ── -->
+        <!-- ── ROW 3: MODULE OVERVIEW QUICK LINKS ── -->
+        <div style="font-size:13px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#6366f1;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+          <i class="bi bi-grid-1x2-fill"></i> Module Overview
+        </div>
         <div class="row g-3 mb-4">
           <div class="col-6 col-md-4 col-lg-2">
-            <div class="stat-card text-center" style="cursor:pointer;" onclick="showView('domainac-list')">
+            <div class="stat-card text-center" style="cursor:pointer;" onclick="showView('account-management')">
               <div style="font-size:22px;color:#6366f1;margin-bottom:6px;"><i class="bi bi-hdd-network"></i></div>
               <div class="value" style="font-size:22px;">3</div>
               <div class="label">Domain ACs</div>
             </div>
           </div>
           <div class="col-6 col-md-4 col-lg-2">
-            <div class="stat-card text-center" style="cursor:pointer;" onclick="showView('server-list')">
+            <div class="stat-card text-center" style="cursor:pointer;" onclick="showView('account-management');setTimeout(()=>{document.getElementById('actab-server-tab').click()},50)">
               <div style="font-size:22px;color:#f59e0b;margin-bottom:6px;"><i class="bi bi-server"></i></div>
               <div class="value" style="font-size:22px;">12</div>
               <div class="label">Servers</div>
             </div>
           </div>
           <div class="col-6 col-md-4 col-lg-2">
-            <div class="stat-card text-center" style="cursor:pointer;" onclick="showView('webmail-list')">
+            <div class="stat-card text-center" style="cursor:pointer;" onclick="showView('account-management');setTimeout(()=>{document.getElementById('actab-webmail-tab').click()},50)">
               <div style="font-size:22px;color:#10b981;margin-bottom:6px;"><i class="bi bi-envelope-at"></i></div>
               <div class="value" style="font-size:22px;">34</div>
               <div class="label">Webmail ACs</div>
@@ -2028,31 +2153,22 @@ input[type="file"].form-control {
           </div>
         </div>
 
-        <!-- ── CHARTS ROW ── -->
+        <!-- ── ROW 4: Module Record Count Bar + Account Types Pie ── -->
         <div class="row g-4 mb-4">
-
-          <!-- Pie Chart: Domain Status Distribution -->
-          <div class="col-12 col-md-4">
+          <div class="col-12 col-md-8">
             <div class="table-container" style="padding:20px;">
               <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-                <i class="bi bi-pie-chart-fill text-primary"></i> Domain Status
+                <i class="bi bi-bar-chart-line-fill text-success"></i> Record Count by Module
               </div>
-              <div style="position:relative;height:200px;display:flex;align-items:center;justify-content:center;">
-                <canvas id="chart-domain-pie"></canvas>
-              </div>
-              <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;justify-content:center;font-size:12px;">
-                <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:50%;background:#22c55e;display:inline-block;"></span>Active (38)</span>
-                <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>Expiring (7)</span>
-                <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:50%;background:#ef4444;display:inline-block;"></span>Expired (3)</span>
+              <div style="position:relative;height:220px;">
+                <canvas id="chart-modules-bar"></canvas>
               </div>
             </div>
           </div>
-
-          <!-- Pie Chart: Advertiser/Module Distribution -->
           <div class="col-12 col-md-4">
-            <div class="table-container" style="padding:20px;">
+            <div class="table-container" style="padding:20px;height:100%;">
               <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-                <i class="bi bi-pie-chart-fill text-danger"></i> Account Types
+                <i class="bi bi-pie-chart-fill text-danger"></i> Account Type Distribution
               </div>
               <div style="position:relative;height:200px;display:flex;align-items:center;justify-content:center;">
                 <canvas id="chart-accounts-pie"></canvas>
@@ -2065,10 +2181,12 @@ input[type="file"].form-control {
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Bar Chart: Asset Overview -->
+        <!-- ── ROW 5: Assets Bar + Upcoming Server Renewals ── -->
+        <div class="row g-4 mb-4">
           <div class="col-12 col-md-4">
-            <div class="table-container" style="padding:20px;">
+            <div class="table-container" style="padding:20px;height:100%;">
               <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
                 <i class="bi bi-bar-chart-fill" style="color:#8b5cf6;"></i> Assets by Category
               </div>
@@ -2077,25 +2195,29 @@ input[type="file"].form-control {
               </div>
             </div>
           </div>
-
-        </div>
-
-        <!-- ── SECOND CHARTS ROW ── -->
-        <div class="row g-4 mb-4">
-
-          <!-- Bar Chart: Monthly Domains Added -->
           <div class="col-12 col-md-8">
-            <div class="table-container" style="padding:20px;">
-              <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-                <i class="bi bi-bar-chart-line-fill text-success"></i> Module Record Count
+            <div class="table-container">
+              <div class="table-header">
+                <h6><i class="bi bi-server me-2 text-warning"></i>Upcoming Server Renewals</h6>
               </div>
-              <div style="position:relative;height:220px;">
-                <canvas id="chart-modules-bar"></canvas>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Server Name</th><th>Type</th><th>Provider</th><th>Expiry Date</th><th>Days Left</th><th>Status</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>SRV-EU-03</td><td>Shared</td><td>Hostinger</td><td>2024-08-05</td><td><span class="expiry-badge expiry-critical">7 days</span></td><td><span class="badge-status badge-inactive">Critical</span></td></tr>
+                    <tr><td>SRV-US-01</td><td>VPS</td><td>DigitalOcean</td><td>2024-09-15</td><td><span class="expiry-badge expiry-warning">48 days</span></td><td><span class="badge-status badge-pending">Upcoming</span></td></tr>
+                    <tr><td>SRV-ASIA-02</td><td>Dedicated</td><td>AWS</td><td>2025-01-20</td><td><span class="expiry-badge expiry-ok">175 days</span></td><td><span class="badge-status badge-active">OK</span></td></tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Pie: Employee Status -->
+        <!-- ── ROW 6: Employee Status Pie ── -->
+        <div class="row g-4">
           <div class="col-12 col-md-4">
             <div class="table-container" style="padding:20px;">
               <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
@@ -2110,114 +2232,285 @@ input[type="file"].form-control {
               </div>
             </div>
           </div>
+          <div class="col-12 col-md-8">
+            <div class="table-container" style="padding:20px;height:100%;display:flex;flex-direction:column;justify-content:center;">
+              <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+                <i class="bi bi-info-circle-fill text-primary"></i> Quick Summary
+              </div>
+              <div class="row g-3">
+                <div class="col-6"><div style="background:#f8fafc;border-radius:10px;padding:14px;border-left:3px solid #22c55e;"><div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.6px;">Active Employees</div><div style="font-size:22px;font-weight:700;color:#1e293b;margin-top:4px;">2 / 3</div></div></div>
+                <div class="col-6"><div style="background:#f8fafc;border-radius:10px;padding:14px;border-left:3px solid #6366f1;"><div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.6px;">Total Assets</div><div style="font-size:22px;font-weight:700;color:#1e293b;margin-top:4px;">15</div></div></div>
+                <div class="col-6"><div style="background:#f8fafc;border-radius:10px;padding:14px;border-left:3px solid #f59e0b;"><div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.6px;">Active Advertisers</div><div style="font-size:22px;font-weight:700;color:#1e293b;margin-top:4px;">2</div></div></div>
+                <div class="col-6"><div style="background:#f8fafc;border-radius:10px;padding:14px;border-left:3px solid #ef4444;"><div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.6px;">SIM Cards</div><div style="font-size:22px;font-weight:700;color:#1e293b;margin-top:4px;">3</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        </div>
-        <div class="row g-4">
-          <div class="col-12">
-            <div class="table-container">
-              <div class="table-header">
-                <h6><i class="bi bi-globe2 me-2 text-primary"></i>Upcoming Domain Renewals</h6>
-              </div>
-              <div class="table-responsive">
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Domain Name</th>
-                      <th>Provider</th>
-                      <th>Expiry Date</th>
-                      <th>Days Left</th>
-                      <th>Email</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>digitalmarkethub.net</td>
-                      <td>Namecheap</td>
-                      <td>2024-08-10</td>
-                      <td><span class="expiry-badge expiry-critical">12 days</span></td>
-                      <td>registrar@dmhub.net</td>
-                      <td><span class="badge-status badge-pending">Renew Now</span></td>
-                    </tr>
-                    <tr>
-                      <td>adpros.co</td>
-                      <td>GoDaddy</td>
-                      <td>2024-08-25</td>
-                      <td><span class="expiry-badge expiry-warning">27 days</span></td>
-                      <td>admin@adpros.co</td>
-                      <td><span class="badge-status badge-pending">Upcoming</span></td>
-                    </tr>
-                    <tr>
-                      <td>mediareach.org</td>
-                      <td>Namecheap</td>
-                      <td>2024-09-05</td>
-                      <td><span class="expiry-badge expiry-warning">38 days</span></td>
-                      <td>info@mediareach.org</td>
-                      <td><span class="badge-status badge-pending">Upcoming</span></td>
-                    </tr>
-                    <tr>
-                      <td>techventures.com</td>
-                      <td>GoDaddy</td>
-                      <td>2025-12-31</td>
-                      <td><span class="expiry-badge expiry-ok">520 days</span></td>
-                      <td>admin@techventures.com</td>
-                      <td><span class="badge-status badge-active">OK</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="col-12">
-            <div class="table-container">
-              <div class="table-header">
-                <h6><i class="bi bi-server me-2 text-warning"></i>Upcoming Server Renewals</h6>
-              </div>
-              <div class="table-responsive">
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Server Name</th>
-                      <th>Type</th>
-                      <th>Provider</th>
-                      <th>Expiry Date</th>
-                      <th>Days Left</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>SRV-EU-03</td>
-                      <td>Shared</td>
-                      <td>Hostinger</td>
-                      <td>2024-08-05</td>
-                      <td><span class="expiry-badge expiry-critical">7 days</span></td>
-                      <td><span class="badge-status badge-inactive">Critical</span></td>
-                    </tr>
-                    <tr>
-                      <td>SRV-US-01</td>
-                      <td>VPS</td>
-                      <td>DigitalOcean</td>
-                      <td>2024-09-15</td>
-                      <td><span class="expiry-badge expiry-warning">48 days</span></td>
-                      <td><span class="badge-status badge-pending">Upcoming</span></td>
-                    </tr>
-                    <tr>
-                      <td>SRV-ASIA-02</td>
-                      <td>Dedicated</td>
-                      <td>AWS</td>
-                      <td>2025-01-20</td>
-                      <td><span class="expiry-badge expiry-ok">175 days</span></td>
-                      <td><span class="badge-status badge-active">OK</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
+
+      <!-- ═══ VIEW: ACCOUNT MANAGEMENT (Tabbed — like Assets) ═══ -->
+      <div class="view-panel" id="view-account-management">
+        <div class="list-view-wrapper">
+          <div class="list-view-topbar">
+            <h6><i class="bi bi-person-workspace me-2 text-primary"></i>Account Management</h6>
+          </div>
+
+          <!-- Account Management Tabs -->
+          <ul class="nav nav-tabs mb-3" id="accountTabs" role="tablist" style="border-bottom:2px solid #e2e8f0;">
+            <!-- Domain AC — has a dropdown indicator -->
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="actab-domainac-tab" data-bs-toggle="tab" data-bs-target="#actab-domainac" type="button" role="tab" style="font-size:13px;font-weight:600;"><i class="bi bi-hdd-network me-1 text-primary"></i> Domain AC</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="actab-server-tab" data-bs-toggle="tab" data-bs-target="#actab-server" type="button" role="tab" style="font-size:13px;font-weight:600;"><i class="bi bi-server me-1 text-warning"></i> Server AC</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="actab-webmail-tab" data-bs-toggle="tab" data-bs-target="#actab-webmail" type="button" role="tab" style="font-size:13px;font-weight:600;"><i class="bi bi-envelope-at me-1 text-success"></i> Webmail AC</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="actab-linkedin-tab" data-bs-toggle="tab" data-bs-target="#actab-linkedin" type="button" role="tab" style="font-size:13px;font-weight:600;"><i class="bi bi-linkedin me-1" style="color:#0a66c2;"></i> LinkedIn AC</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="actab-teams-tab" data-bs-toggle="tab" data-bs-target="#actab-teams" type="button" role="tab" style="font-size:13px;font-weight:600;"><i class="bi bi-microsoft-teams me-1" style="color:#6264a7;"></i> Teams AC</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="actab-telegram-tab" data-bs-toggle="tab" data-bs-target="#actab-telegram" type="button" role="tab" style="font-size:13px;font-weight:600;"><i class="bi bi-telegram me-1" style="color:#0088cc;"></i> Telegram AC</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="actab-gmail-tab" data-bs-toggle="tab" data-bs-target="#actab-gmail" type="button" role="tab" style="font-size:13px;font-weight:600;"><i class="bi bi-envelope-fill me-1" style="color:#ea4335;"></i> Gmail AC</button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="accountTabsContent">
+
+            <!-- ── Domain AC Tab (has sub-tabs for Domain AC List & Company Wise) ── -->
+            <div class="tab-pane fade show active" id="actab-domainac" role="tabpanel">
+              <!-- Sub-tabs for Domain AC -->
+              <ul class="nav nav-pills mb-3" id="domainAcSubTabs" role="tablist" style="gap:6px;">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="actab-dac-list-tab" data-bs-toggle="tab" data-bs-target="#actab-dac-list" type="button" role="tab" style="font-size:12.5px;font-weight:600;border-radius:8px;"><i class="bi bi-list-ul me-1"></i> Domain AC List</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="actab-dac-company-tab" data-bs-toggle="tab" data-bs-target="#actab-dac-company" type="button" role="tab" style="font-size:12.5px;font-weight:600;border-radius:8px;"><i class="bi bi-building-check me-1"></i> Domain List — Company Wise</button>
+                </li>
+              </ul>
+              <div class="tab-content" id="domainAcSubTabsContent">
+                <!-- Domain AC List -->
+                <div class="tab-pane fade show active" id="actab-dac-list" role="tabpanel">
+                  <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                    <div class="search-box" style="min-width:200px;"><i class="bi bi-search"></i><input type="text" placeholder="Search domain accounts…" oninput="filterTable(this,'tbl-domainac2')"></div>
+                    <button class="btn-add-main" onclick="openModal('modal-domainac')"><i class="bi bi-plus-lg"></i> Add Domain Account</button>
+                  </div>
+                  <div class="table-container">
+                    <div class="table-responsive">
+                      <table class="data-table" id="tbl-domainac2">
+                        <thead><tr><th>#</th><th>Domain Name</th><th>Name</th><th>Company</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody>
+                          <tr>
+                            <td>1</td><td>techventures.com</td><td>Rahul Sharma</td><td>TechVentures Pvt</td><td>rahul@techventures.com</td>
+                            <td><span class="badge-status badge-active">Active</span></td>
+                            <td><div class="tbl-actions">
+                              <button class="btn-tbl-view" onclick="openViewModal('domainac',0)"><i class="bi bi-eye"></i></button>
+                              <button class="btn-tbl-edit" onclick="openEditPage('domainac','Domain Account','Account Management > Domain AC')"><i class="bi bi-pencil"></i></button>
+                              <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
+                            </div></td>
+                          </tr>
+                          <tr>
+                            <td>2</td><td>digitalmarkethub.net</td><td>Priya Patel</td><td>Digital Market Hub</td><td>priya@dmhub.net</td>
+                            <td><span class="badge-status badge-pending">Pending</span></td>
+                            <td><div class="tbl-actions">
+                              <button class="btn-tbl-view" onclick="openViewModal('domainac',1)"><i class="bi bi-eye"></i></button>
+                              <button class="btn-tbl-edit" onclick="openEditPage('domainac','Domain Account','Account Management > Domain AC')"><i class="bi bi-pencil"></i></button>
+                              <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
+                            </div></td>
+                          </tr>
+                          <tr>
+                            <td>3</td><td>cloudsolutions.io</td><td>Amit Verma</td><td>Cloud Solutions Inc</td><td>amit@cloudsol.io</td>
+                            <td><span class="badge-status badge-active">Active</span></td>
+                            <td><div class="tbl-actions">
+                              <button class="btn-tbl-view" onclick="openViewModal('domainac',2)"><i class="bi bi-eye"></i></button>
+                              <button class="btn-tbl-edit" onclick="openEditPage('domainac','Domain Account','Account Management > Domain AC')"><i class="bi bi-pencil"></i></button>
+                              <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
+                            </div></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <!-- Domain List Company Wise -->
+                <div class="tab-pane fade" id="actab-dac-company" role="tabpanel">
+                  <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                    <div class="search-box" style="min-width:200px;"><i class="bi bi-search"></i><input type="text" placeholder="Search companies…" oninput="filterCwItems(this)"></div>
+                    <button class="btn-add-main" onclick="openModal('modal-add-company')"><i class="bi bi-plus-lg"></i> Add Company</button>
+                  </div>
+                  <div class="cw-accordion">
+                    <div class="cw-company-item">
+                      <div class="cw-company-header" onclick="toggleCwCompany(this)">
+                        <div class="cw-company-name"><div class="cw-company-icon"><i class="bi bi-building"></i></div>TechVentures Pvt<span class="cw-domain-count">2 Domains</span></div>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                          <button class="btn-add-domain" onclick="event.stopPropagation();openModal('modal-domain')"><i class="bi bi-plus-lg"></i> Add Domain</button>
+                          <i class="bi bi-chevron-down cw-chevron"></i>
+                        </div>
+                      </div>
+                      <div class="cw-company-body">
+                        <div class="table-container">
+                          <table class="data-table" style="table-layout:fixed;width:100%;">
+                            <thead><tr><th style="width:36px;">#</th><th>Domain Name</th><th>Provider</th><th>Expiry Date</th><th style="width:72px;">Privacy</th><th style="width:100px;">Status</th><th style="width:112px;">Actions</th></tr></thead>
+                            <tbody>
+                              <tr><td>1</td><td><i class="bi bi-globe2 text-primary me-1"></i> techventures.com</td><td>GoDaddy</td><td>2025-12-31</td><td><span class="badge-status badge-active" style="font-size:10px;">On</span></td><td><span class="badge-status badge-active" style="font-size:10px;">Active</span></td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('domain',0)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('domain','Domain','Account Management > Domain AC > Company Wise')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                              <tr><td>2</td><td><i class="bi bi-globe2 text-primary me-1"></i> techventures.net</td><td>GoDaddy</td><td>2025-12-31</td><td><span class="badge-status badge-active" style="font-size:10px;">On</span></td><td><span class="badge-status badge-active" style="font-size:10px;">Active</span></td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('domain',0)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('domain','Domain','Account Management > Domain AC > Company Wise')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="cw-company-item">
+                      <div class="cw-company-header" onclick="toggleCwCompany(this)">
+                        <div class="cw-company-name"><div class="cw-company-icon"><i class="bi bi-building"></i></div>Digital Market Hub<span class="cw-domain-count">1 Domain</span></div>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                          <button class="btn-add-domain" onclick="event.stopPropagation();openModal('modal-domain')"><i class="bi bi-plus-lg"></i> Add Domain</button>
+                          <i class="bi bi-chevron-down cw-chevron"></i>
+                        </div>
+                      </div>
+                      <div class="cw-company-body">
+                        <div class="table-container">
+                          <table class="data-table" style="table-layout:fixed;width:100%;">
+                            <thead><tr><th style="width:36px;">#</th><th>Domain Name</th><th>Provider</th><th>Expiry Date</th><th style="width:72px;">Privacy</th><th style="width:100px;">Status</th><th style="width:112px;">Actions</th></tr></thead>
+                            <tbody>
+                              <tr><td>1</td><td><i class="bi bi-globe2 text-warning me-1"></i> digitalmarkethub.net</td><td>Namecheap</td><td class="text-danger">2024-08-10</td><td><span class="badge-status badge-inactive" style="font-size:10px;">Off</span></td><td><span class="badge-status badge-pending" style="font-size:10px;">Expiring Soon</span></td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('domain',1)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('domain','Domain','Account Management > Domain AC > Company Wise')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Server AC Tab ── -->
+            <div class="tab-pane fade" id="actab-server" role="tabpanel">
+              <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div class="search-box" style="min-width:200px;"><i class="bi bi-search"></i><input type="text" placeholder="Search servers…" oninput="filterTable(this,'tbl-server2')"></div>
+                <button class="btn-add-main" onclick="openModal('modal-server')"><i class="bi bi-plus-lg"></i> Add Server</button>
+              </div>
+              <div class="table-container">
+                <div class="table-responsive">
+                  <table class="data-table" id="tbl-server2">
+                    <thead><tr><th>#</th><th>Server Name</th><th>Type</th><th>Company</th><th>Expiry Date</th><th>Provider</th><th>Actions</th></tr></thead>
+                    <tbody>
+                      <tr><td>1</td><td>SRV-US-01</td><td>VPS</td><td>TechVentures Pvt</td><td>2025-09-15</td><td>DigitalOcean</td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('server',0)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('server','Server Account','Account Management > Server AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                      <tr><td>2</td><td>SRV-EU-03</td><td>Shared</td><td>Digital Market Hub</td><td class="text-danger">2024-08-05</td><td>Hostinger</td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('server',1)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('server','Server Account','Account Management > Server AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                      <tr><td>3</td><td>SRV-ASIA-02</td><td>Dedicated</td><td>Cloud Solutions Inc</td><td>2025-01-20</td><td>AWS</td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('server',2)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('server','Server Account','Account Management > Server AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Webmail AC Tab ── -->
+            <div class="tab-pane fade" id="actab-webmail" role="tabpanel">
+              <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div class="search-box" style="min-width:200px;"><i class="bi bi-search"></i><input type="text" placeholder="Search webmail accounts…" oninput="filterTable(this,'tbl-webmail2')"></div>
+                <button class="btn-add-main" onclick="openModal('modal-webmail')"><i class="bi bi-plus-lg"></i> Add Webmail Account</button>
+              </div>
+              <div class="table-container">
+                <div class="table-responsive">
+                  <table class="data-table" id="tbl-webmail2">
+                    <thead><tr><th>#</th><th>Email Address</th><th>Domain</th><th>Provider</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                      <tr><td>1</td><td>admin@techventures.com</td><td>techventures.com</td><td>cPanel</td><td><span class="badge-status badge-active">Active</span></td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('webmail',0)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('webmail','Webmail Account','Account Management > Webmail AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                      <tr><td>2</td><td>info@digitalmarkethub.net</td><td>digitalmarkethub.net</td><td>Zoho Mail</td><td><span class="badge-status badge-active">Active</span></td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('webmail',1)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('webmail','Webmail Account','Account Management > Webmail AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                      <tr><td>3</td><td>support@cloudsolutions.io</td><td>cloudsolutions.io</td><td>Google Workspace</td><td><span class="badge-status badge-active">Active</span></td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('webmail',2)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('webmail','Webmail Account','Account Management > Webmail AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── LinkedIn AC Tab ── -->
+            <div class="tab-pane fade" id="actab-linkedin" role="tabpanel">
+              <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div class="search-box" style="min-width:200px;"><i class="bi bi-search"></i><input type="text" placeholder="Search LinkedIn accounts…" oninput="filterTable(this,'tbl-linkedin2')"></div>
+                <button class="btn-add-main" onclick="openModal('modal-linkedin')"><i class="bi bi-plus-lg"></i> Add LinkedIn Account</button>
+              </div>
+              <div class="table-container">
+                <div class="table-responsive">
+                  <table class="data-table" id="tbl-linkedin2">
+                    <thead><tr><th>#</th><th>Account Name</th><th>Email</th><th>Profile URL</th><th>2FA</th><th>Actions</th></tr></thead>
+                    <tbody>
+                      <tr><td>1</td><td>Rahul Sharma</td><td>rahul@gmail.com</td><td>linkedin.com/in/rahulsharma</td><td><span class="badge-status badge-active">Enabled</span></td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('linkedin',0)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('linkedin','LinkedIn Account','Account Management > LinkedIn AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                      <tr><td>2</td><td>Priya Patel</td><td>priya@gmail.com</td><td>linkedin.com/in/priyapatel</td><td><span class="badge-status badge-inactive">Disabled</span></td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('linkedin',1)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('linkedin','LinkedIn Account','Account Management > LinkedIn AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Teams AC Tab ── -->
+            <div class="tab-pane fade" id="actab-teams" role="tabpanel">
+              <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div class="search-box" style="min-width:200px;"><i class="bi bi-search"></i><input type="text" placeholder="Search Teams accounts…" oninput="filterTable(this,'tbl-teams2')"></div>
+                <button class="btn-add-main" onclick="openModal('modal-teams')"><i class="bi bi-plus-lg"></i> Add Teams Account</button>
+              </div>
+              <div class="table-container">
+                <div class="table-responsive">
+                  <table class="data-table" id="tbl-teams2">
+                    <thead><tr><th>#</th><th>Display Name</th><th>UPN (Email)</th><th>Phone</th><th>Actions</th></tr></thead>
+                    <tbody>
+                      <tr><td>1</td><td>Rahul Sharma</td><td>rahul@techventures.onmicrosoft.com</td><td>+91 98765 43210</td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('teams',0)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('teams','Teams Account','Account Management > Teams AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                      <tr><td>2</td><td>Priya Patel</td><td>priya@dmhub.onmicrosoft.com</td><td>+91 99887 76655</td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('teams',1)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('teams','Teams Account','Account Management > Teams AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Telegram AC Tab ── -->
+            <div class="tab-pane fade" id="actab-telegram" role="tabpanel">
+              <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div class="search-box" style="min-width:200px;"><i class="bi bi-search"></i><input type="text" placeholder="Search Telegram accounts…" oninput="filterTable(this,'tbl-telegram2')"></div>
+                <button class="btn-add-main" onclick="openModal('modal-telegram')"><i class="bi bi-plus-lg"></i> Add Telegram Account</button>
+              </div>
+              <div class="table-container">
+                <div class="table-responsive">
+                  <table class="data-table" id="tbl-telegram2">
+                    <thead><tr><th>#</th><th>Account Name</th><th>Username</th><th>Phone Number</th><th>Actions</th></tr></thead>
+                    <tbody>
+                      <tr><td>1</td><td>TechVentures Channel</td><td>@techventures_official</td><td>+91 98765 43210</td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('telegram',0)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('telegram','Telegram Account','Account Management > Telegram AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                      <tr><td>2</td><td>Digital Market Hub</td><td>@dmhub_news</td><td>+91 99887 76655</td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('telegram',1)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('telegram','Telegram Account','Account Management > Telegram AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Gmail AC Tab ── -->
+            <div class="tab-pane fade" id="actab-gmail" role="tabpanel">
+              <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div class="search-box" style="min-width:200px;"><i class="bi bi-search"></i><input type="text" placeholder="Search Gmail accounts…" oninput="filterTable(this,'tbl-gmail2')"></div>
+                <button class="btn-add-main" onclick="openModal('modal-gmail')"><i class="bi bi-plus-lg"></i> Add Gmail Account</button>
+              </div>
+              <div class="table-container">
+                <div class="table-responsive">
+                  <table class="data-table" id="tbl-gmail2">
+                    <thead><tr><th>#</th><th>Gmail Address</th><th>Phone</th><th>Recovery Email</th><th>Actions</th></tr></thead>
+                    <tbody>
+                      <tr><td>1</td><td>techventures.admin@gmail.com</td><td>+91 98765 43210</td><td>rahul@techventures.com</td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('gmail',0)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('gmail','Gmail Account','Account Management > Gmail AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                      <tr><td>2</td><td>dmhub.marketing@gmail.com</td><td>+91 99887 76655</td><td>priya@dmhub.net</td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('gmail',1)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('gmail','Gmail Account','Account Management > Gmail AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                      <tr><td>3</td><td>cloudsol.support@gmail.com</td><td>+91 77665 54433</td><td>amit@cloudsol.io</td><td><div class="tbl-actions"><button class="btn-tbl-view" onclick="openViewModal('gmail',2)"><i class="bi bi-eye"></i></button><button class="btn-tbl-edit" onclick="openEditPage('gmail','Gmail Account','Account Management > Gmail AC')"><i class="bi bi-pencil"></i></button><button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button></div></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /tab-content accountTabsContent -->
+        </div>
+      </div>
 
       <!-- ═══ VIEW: DOMAIN AC LIST (Table) ═══ -->
       <div class="view-panel" id="view-domainac-list">
@@ -2239,7 +2532,7 @@ input[type="file"].form-control {
                     <td><span class="badge-status badge-active">Active</span></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('domainac',0)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-domainac')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('domainac','Domain Account','Account Management > Domain AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2248,7 +2541,7 @@ input[type="file"].form-control {
                     <td><span class="badge-status badge-pending">Pending</span></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('domainac',1)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-domainac')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('domainac','Domain Account','Account Management > Domain AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2257,7 +2550,7 @@ input[type="file"].form-control {
                     <td><span class="badge-status badge-active">Active</span></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('domainac',2)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-domainac')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('domainac','Domain Account','Account Management > Domain AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2288,7 +2581,7 @@ input[type="file"].form-control {
                     <td><span class="badge-status badge-active">On</span></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('domain',0)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-domain')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('domain','Domain','Account Management > Domain AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2297,7 +2590,7 @@ input[type="file"].form-control {
                     <td><span class="badge-status badge-inactive">Off</span></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('domain',1)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-domain')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('domain','Domain','Account Management > Domain AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2358,7 +2651,7 @@ input[type="file"].form-control {
                         <td><span class="badge-status badge-active" style="font-size:10px;">Active</span></td>
                         <td><div class="tbl-actions">
                           <button class="btn-tbl-view" onclick="openViewModal('domain',0)"><i class="bi bi-eye"></i></button>
-                          <button class="btn-tbl-edit" onclick="openModal('modal-domain')"><i class="bi bi-pencil"></i></button>
+                          <button class="btn-tbl-edit" onclick="openEditPage('domain','Domain','Account Management > Domain AC')"><i class="bi bi-pencil"></i></button>
                           <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                         </div></td>
                       </tr>
@@ -2371,7 +2664,7 @@ input[type="file"].form-control {
                         <td><span class="badge-status badge-active" style="font-size:10px;">Active</span></td>
                         <td><div class="tbl-actions">
                           <button class="btn-tbl-view" onclick="openViewModal('domain',0)"><i class="bi bi-eye"></i></button>
-                          <button class="btn-tbl-edit" onclick="openModal('modal-domain')"><i class="bi bi-pencil"></i></button>
+                          <button class="btn-tbl-edit" onclick="openEditPage('domain','Domain','Account Management > Domain AC')"><i class="bi bi-pencil"></i></button>
                           <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                         </div></td>
                       </tr>
@@ -2418,7 +2711,7 @@ input[type="file"].form-control {
                         <td><span class="badge-status badge-pending" style="font-size:10px;">Expiring Soon</span></td>
                         <td><div class="tbl-actions">
                           <button class="btn-tbl-view" onclick="openViewModal('domain',1)"><i class="bi bi-eye"></i></button>
-                          <button class="btn-tbl-edit" onclick="openModal('modal-domain')"><i class="bi bi-pencil"></i></button>
+                          <button class="btn-tbl-edit" onclick="openEditPage('domain','Domain','Account Management > Domain AC')"><i class="bi bi-pencil"></i></button>
                           <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                         </div></td>
                       </tr>
@@ -2465,7 +2758,7 @@ input[type="file"].form-control {
                         <td><span class="badge-status badge-active" style="font-size:10px;">Active</span></td>
                         <td><div class="tbl-actions">
                           <button class="btn-tbl-view" onclick="openViewModal('domain',0)"><i class="bi bi-eye"></i></button>
-                          <button class="btn-tbl-edit" onclick="openModal('modal-domain')"><i class="bi bi-pencil"></i></button>
+                          <button class="btn-tbl-edit" onclick="openEditPage('domain','Domain','Account Management > Domain AC')"><i class="bi bi-pencil"></i></button>
                           <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                         </div></td>
                       </tr>
@@ -2498,7 +2791,7 @@ input[type="file"].form-control {
                     <td>1</td><td>SRV-US-01</td><td>VPS</td><td>TechVentures Pvt</td><td>2025-09-15</td><td>DigitalOcean</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('server',0)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-server')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('server','Server Account','Account Management > Server AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2506,7 +2799,7 @@ input[type="file"].form-control {
                     <td>2</td><td>SRV-EU-03</td><td>Shared</td><td>Digital Market Hub</td><td class="text-danger">2024-08-05</td><td>Hostinger</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('server',1)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-server')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('server','Server Account','Account Management > Server AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2514,7 +2807,7 @@ input[type="file"].form-control {
                     <td>3</td><td>SRV-ASIA-02</td><td>Dedicated</td><td>Cloud Solutions Inc</td><td>2025-01-20</td><td>AWS</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('server',2)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-server')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('server','Server Account','Account Management > Server AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2544,7 +2837,7 @@ input[type="file"].form-control {
                     <td>1</td><td>TechVentures Portal</td><td>TechVentures Pvt</td><td>techventures.com</td><td>admin@techventures.com</td><td><a href="#">webmail.techventures.com</a></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('webmail',0)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-webmail')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('webmail','Webmail Account','Account Management > Webmail AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2552,7 +2845,7 @@ input[type="file"].form-control {
                     <td>2</td><td>DMHub Mail</td><td>Digital Market Hub</td><td>digitalmarkethub.net</td><td>info@dmhub.net</td><td><a href="#">webmail.dmhub.net</a></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('webmail',1)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-webmail')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('webmail','Webmail Account','Account Management > Webmail AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2560,7 +2853,7 @@ input[type="file"].form-control {
                     <td>3</td><td>Cloud Solutions Mail</td><td>Cloud Solutions Inc</td><td>cloudsolutions.io</td><td>ops@cloudsolutions.io</td><td><a href="#">webmail.cloudsolutions.io</a></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('webmail',2)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-webmail')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('webmail','Webmail Account','Account Management > Webmail AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2591,7 +2884,7 @@ input[type="file"].form-control {
                     <td><span class="badge-status badge-active">Enabled</span></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('linkedin',0)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-linkedin')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('linkedin','LinkedIn Account','Account Management > LinkedIn AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2600,7 +2893,7 @@ input[type="file"].form-control {
                     <td><span class="badge-status badge-inactive">Disabled</span></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('linkedin',1)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-linkedin')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('linkedin','LinkedIn Account','Account Management > LinkedIn AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2630,7 +2923,7 @@ input[type="file"].form-control {
                     <td>1</td><td>Rahul Sharma</td><td>rahul@techventures.onmicrosoft.com</td><td>+91 98765 43210</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('teams',0)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-teams')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('teams','Teams Account','Account Management > Teams AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2638,7 +2931,7 @@ input[type="file"].form-control {
                     <td>2</td><td>Priya Patel</td><td>priya@dmhub.onmicrosoft.com</td><td>+91 99887 76655</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('teams',1)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-teams')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('teams','Teams Account','Account Management > Teams AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2668,7 +2961,7 @@ input[type="file"].form-control {
                     <td>1</td><td>TechVentures Channel</td><td>@techventures</td><td>+91 98765 43210</td><td>TechVentures</td><td>tg.backup@techventures.com</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('telegram',0)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-telegram')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('telegram','Telegram Account','Account Management > Telegram AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2676,7 +2969,7 @@ input[type="file"].form-control {
                     <td>2</td><td>DMHub Channel</td><td>@dmhubofficial</td><td>+91 99887 76655</td><td>Digital Market Hub</td><td>tg@dmhub.net</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('telegram',1)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-telegram')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('telegram','Telegram Account','Account Management > Telegram AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2707,7 +3000,7 @@ input[type="file"].form-control {
                     <td><span class="badge-status badge-active">ON</span></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('gmail',0)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-gmail')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('gmail','Gmail Account','Account Management > Gmail AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2716,7 +3009,7 @@ input[type="file"].form-control {
                     <td><span class="badge-status badge-inactive">OFF</span></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('gmail',1)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-gmail')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('gmail','Gmail Account','Account Management > Gmail AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2725,7 +3018,7 @@ input[type="file"].form-control {
                     <td><span class="badge-status badge-active">ON</span></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('gmail',2)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-gmail')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('gmail','Gmail Account','Account Management > Gmail AC')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2990,7 +3283,7 @@ input[type="file"].form-control {
                     <td>1</td><td>TechVentures Pvt Ltd</td><td class="pw-mask">&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4321</td><td>HDFC0001234</td><td>HDFC Bank</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('bank',0)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-bank')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('bank','Bank & Company Details','Company & Bank Details')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -2998,7 +3291,7 @@ input[type="file"].form-control {
                     <td>2</td><td>Digital Market Hub</td><td class="pw-mask">&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 8765</td><td>ICICI0005678</td><td>ICICI Bank</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('bank',1)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-bank')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('bank','Bank & Company Details','Company & Bank Details')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -3006,7 +3299,7 @@ input[type="file"].form-control {
                     <td>3</td><td>Cloud Solutions Inc</td><td class="pw-mask">&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 2233</td><td>SWIFT-CLSUIN22</td><td>International</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('bank',2)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-bank')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('bank','Bank & Company Details','Company & Bank Details')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -3037,7 +3330,7 @@ input[type="file"].form-control {
                     <td><span class="badge-status badge-active">Active</span></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('sim',0)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-sim')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('sim','SIM Card','SIM Card Details')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -3046,7 +3339,7 @@ input[type="file"].form-control {
                     <td><span class="badge-status badge-active">Active</span></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('sim',1)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-sim')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('sim','SIM Card','SIM Card Details')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -3055,7 +3348,7 @@ input[type="file"].form-control {
                     <td><span class="badge-status badge-inactive">Inactive</span></td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('sim',2)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-sim')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('sim','SIM Card','SIM Card Details')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -3170,7 +3463,7 @@ input[type="file"].form-control {
                         <td>1</td><td><span class="badge bg-light text-dark border">AST-IT-001</span></td><td>Laptop</td><td>Rahul Sharma</td><td>Apple</td><td>MacBook Pro 14"</td><td><span class="badge-status badge-active">In Use</span></td><td>2024-01-15</td>
                         <td><div class="tbl-actions">
                           <button class="btn-tbl-view" onclick="openAssetViewModal('it',0)"><i class="bi bi-eye"></i></button>
-                          <button class="btn-tbl-edit" onclick="openModal('modal-it-assets')"><i class="bi bi-pencil"></i></button>
+                          <button class="btn-tbl-edit" onclick="openEditPage('it-assets','IT Asset','Assets Management > IT Assets')"><i class="bi bi-pencil"></i></button>
                           <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                         </div></td>
                       </tr>
@@ -3178,7 +3471,7 @@ input[type="file"].form-control {
                         <td>2</td><td><span class="badge bg-light text-dark border">AST-IT-002</span></td><td>Mobile Phone</td><td>Priya Patel</td><td>Apple</td><td>iPhone 15 Pro</td><td><span class="badge-status badge-active">In Use</span></td><td>2024-02-10</td>
                         <td><div class="tbl-actions">
                           <button class="btn-tbl-view" onclick="openAssetViewModal('it',1)"><i class="bi bi-eye"></i></button>
-                          <button class="btn-tbl-edit" onclick="openModal('modal-it-assets')"><i class="bi bi-pencil"></i></button>
+                          <button class="btn-tbl-edit" onclick="openEditPage('it-assets','IT Asset','Assets Management > IT Assets')"><i class="bi bi-pencil"></i></button>
                           <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                         </div></td>
                       </tr>
@@ -3186,7 +3479,7 @@ input[type="file"].form-control {
                         <td>3</td><td><span class="badge bg-light text-dark border">AST-IT-003</span></td><td>Monitor</td><td>Workstation 4</td><td>Dell</td><td>UltraSharp 27" 4K</td><td><span class="badge-status badge-active">In Use</span></td><td>2024-03-05</td>
                         <td><div class="tbl-actions">
                           <button class="btn-tbl-view" onclick="openAssetViewModal('it',2)"><i class="bi bi-eye"></i></button>
-                          <button class="btn-tbl-edit" onclick="openModal('modal-it-assets')"><i class="bi bi-pencil"></i></button>
+                          <button class="btn-tbl-edit" onclick="openEditPage('it-assets','IT Asset','Assets Management > IT Assets')"><i class="bi bi-pencil"></i></button>
                           <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                         </div></td>
                       </tr>
@@ -3194,7 +3487,7 @@ input[type="file"].form-control {
                         <td>4</td><td><span class="badge bg-light text-dark border">AST-IT-004</span></td><td>Networking</td><td>Server Room</td><td>Cisco</td><td>ISR 4321 Router</td><td><span class="badge-status badge-pending">Shared</span></td><td>2023-11-20</td>
                         <td><div class="tbl-actions">
                           <button class="btn-tbl-view" onclick="openAssetViewModal('it',3)"><i class="bi bi-eye"></i></button>
-                          <button class="btn-tbl-edit" onclick="openModal('modal-it-assets')"><i class="bi bi-pencil"></i></button>
+                          <button class="btn-tbl-edit" onclick="openEditPage('it-assets','IT Asset','Assets Management > IT Assets')"><i class="bi bi-pencil"></i></button>
                           <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                         </div></td>
                       </tr>
@@ -3388,7 +3681,7 @@ input[type="file"].form-control {
                     <td>2022-03-01</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('employee',0)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-employee')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('employee','Employee','Employee')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -3398,7 +3691,7 @@ input[type="file"].form-control {
                     <td>2021-07-15</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('employee',1)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-employee')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('employee','Employee','Employee')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -3408,7 +3701,7 @@ input[type="file"].form-control {
                     <td>2020-11-10</td>
                     <td><div class="tbl-actions">
                       <button class="btn-tbl-view" onclick="openViewModal('employee',2)"><i class="bi bi-eye"></i></button>
-                      <button class="btn-tbl-edit" onclick="openModal('modal-employee')"><i class="bi bi-pencil"></i></button>
+                      <button class="btn-tbl-edit" onclick="openEditPage('employee','Employee','Employee')"><i class="bi bi-pencil"></i></button>
                       <button class="btn-tbl-del" onclick="confirmDeleteRow(this)"><i class="bi bi-trash"></i></button>
                     </div></td>
                   </tr>
@@ -3463,7 +3756,7 @@ input[type="file"].form-control {
           </div>
         </div>
         <div class="modal-footer"><button
-            class="btn btn-primary">Save Entry</button></div>
+            class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -3532,7 +3825,7 @@ input[type="file"].form-control {
           </div>
         </div>
         <div class="modal-footer"><button
-            class="btn btn-primary">Save Domain</button></div>
+            class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -3572,7 +3865,7 @@ input[type="file"].form-control {
           </div>
         </div>
         <div class="modal-footer"><button
-            class="btn btn-primary">Save Server</button></div>
+            class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -3602,7 +3895,7 @@ input[type="file"].form-control {
           </div>
         </div>
         <div class="modal-footer"><button
-            class="btn btn-primary">Save Webmail</button></div>
+            class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -3642,7 +3935,7 @@ input[type="file"].form-control {
           </div>
         </div>
         <div class="modal-footer"><button
-            class="btn btn-primary">Save Account</button></div>
+            class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -3668,7 +3961,7 @@ input[type="file"].form-control {
           </div>
         </div>
         <div class="modal-footer"><button
-            class="btn btn-primary">Save Account</button></div>
+            class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -3698,7 +3991,7 @@ input[type="file"].form-control {
           </div>
         </div>
         <div class="modal-footer"><button
-            class="btn btn-primary">Save Account</button></div>
+            class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -4073,7 +4366,7 @@ input[type="file"].form-control {
           </div>
         </div>
         <div class="modal-footer"><button
-            class="btn btn-primary">Save SIM Card</button></div>
+            class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -4103,7 +4396,7 @@ input[type="file"].form-control {
           </div>
         </div>
         <div class="modal-footer"><button
-            class="btn btn-primary">Save Company</button></div>
+            class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -4199,7 +4492,7 @@ input[type="file"].form-control {
             </div>
           </div>
         </div>
-        <div class="modal-footer"><button class="btn btn-primary">Save IT Asset</button></div>
+        <div class="modal-footer"><button class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -4284,7 +4577,7 @@ input[type="file"].form-control {
             </div>
           </div>
         </div>
-        <div class="modal-footer"><button class="btn btn-primary">Save Office Asset</button></div>
+        <div class="modal-footer"><button class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -4346,7 +4639,7 @@ input[type="file"].form-control {
             </div>
           </div>
         </div>
-        <div class="modal-footer"><button class="btn btn-primary">Save Item</button></div>
+        <div class="modal-footer"><button class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -4407,7 +4700,7 @@ input[type="file"].form-control {
             </div>
           </div>
         </div>
-        <div class="modal-footer"><button class="btn btn-primary">Save Accessory</button></div>
+        <div class="modal-footer"><button class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -4444,7 +4737,7 @@ input[type="file"].form-control {
             </div>
           </div>
         </div>
-        <div class="modal-footer"><button class="btn btn-primary">Save Asset</button></div>
+        <div class="modal-footer"><button class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -4470,7 +4763,7 @@ input[type="file"].form-control {
           </div>
         </div>
         <div class="modal-footer"><button
-            class="btn btn-primary">Save Account</button></div>
+            class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -4583,7 +4876,7 @@ input[type="file"].form-control {
           </div>
         </div>
         <div class="modal-footer"><button
-            class="btn btn-primary">Save Account</button></div>
+            class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -4618,7 +4911,7 @@ input[type="file"].form-control {
             <div class="col-12"><div class="form-label-row"><label class="form-label">Notes</label><button type="button" class="field-info-btn" tabindex="-1"><i class="bi bi-info-circle-fill"></i><span class="info-tooltip">Any extra information or remarks about the employee</span></button></div><textarea class="form-control" rows="3" placeholder="Additional notes..."></textarea></div>
           </div>
         </div>
-        <div class="modal-footer"><button class="btn btn-primary">Save Employee</button></div>
+        <div class="modal-footer"><button class="btn btn-primary">Save Changes</button></div>
       </div>
     </div>
   </div>
@@ -4654,20 +4947,25 @@ input[type="file"].form-control {
   </div>
 
   <!-- Delete Confirm -->
-  <div class="modal fade" id="modal-delete" tabindex="-1">
-    <div class="modal-dialog modal-sm">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Confirm Delete</h5><button
-            type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <div class="modal fade" id="modal-delete" tabindex="-1" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content" style="border-radius:16px;overflow:hidden;border:none;box-shadow:0 20px 60px rgba(0,0,0,0.18);">
+        <div class="modal-header" style="background:#fff1f2;border-bottom:1px solid #fecdd3;padding:20px 24px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="bi bi-trash3" style="color:#dc2626;font-size:16px;"></i>
+            </div>
+            <h5 class="modal-title text-danger mb-0" style="font-size:15px;font-weight:700;">Delete Record</h5>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          <p class="mb-0" style="font-size:14px;">Are you sure you want to delete this entry? This action cannot be
-            undone.</p>
+        <div class="modal-body" style="padding:24px;">
+          <p class="mb-0" style="font-size:14px;color:#374151;line-height:1.6;">Are you sure you want to permanently delete this record? This action <strong>cannot be undone</strong>.</p>
         </div>
-        <div class="modal-footer"><button class="btn btn-secondary btn-sm"
-            data-bs-dismiss="modal">Cancel</button><button class="btn btn-danger btn-sm"
-            id="confirm-del-btn">Delete</button></div>
+        <div class="modal-footer" style="padding:16px 24px;background:#fafafa;border-top:1px solid #f1f5f9;">
+          <button class="btn btn-light btn-sm" data-bs-dismiss="modal" style="border-radius:8px;font-weight:500;padding:8px 18px;">Cancel</button>
+          <button class="btn btn-danger btn-sm" id="confirm-del-btn" style="border-radius:8px;font-weight:500;padding:8px 18px;"><i class="bi bi-trash3 me-1"></i>Delete</button>
+        </div>
       </div>
     </div>
   </div>
@@ -4792,9 +5090,10 @@ input[type="file"].form-control {
     const viewTitles = {
       'overview': ['Dashboard', 'Dashboard'],
       // 'upcoming': ['Upcoming Expiries', 'Domains Overview > Upcoming Expiries'],
+      'account-management': ['Account Management', 'Account Management'],
       'domainac-list': ['Domain AC List', 'Account Management > Domain AC > Domain AC List'],
       'domain-list': ['Domain List', 'Account Management > Domain AC > Domain List'],
-      'domain-company-wise': ['Domain List Company Wise', 'Account Management > Domain AC > Domain List Company Wise'],
+      'domain-company-wise': ['Domain List — Company Wise', 'Account Management > Domain AC > Domain List — Company Wise'],
       'server-list': ['Server List', 'Account Management > Server AC'],
       'webmail-list': ['Webmail List', 'Account Management > Webmail AC'],
       'linkedin-list': ['LinkedIn Accounts', 'Account Management > LinkedIn AC'],
@@ -4803,8 +5102,8 @@ input[type="file"].form-control {
       'gmail-list': ['Gmail Accounts', 'Account Management > Gmail AC'],
       'socialmedia-list': ['Social Media Accounts', 'Social Media Accounts'],
       'advertiser-list': ['Business Advertiser', 'Business Advertiser > Advertiser List'],
-      'bank-list': ['Bank Details', 'Bank Details > Bank List'],
-      'sim-list': ['SIM Card Details', 'SimCard Details > SIM List'],
+      'bank-list': ['Bank & Company Details', 'Company & Bank Details'],
+      'sim-list': ['SIM Card Details', 'SIM Card Details'],
       'company-list': ['Company', 'Company > Company List'],
       'assets-list': ['Assets Management', 'Assets Management'],
       'assets-it': ['IT Assets', 'Assets Management > IT Assets'],
@@ -4812,7 +5111,7 @@ input[type="file"].form-control {
       'assets-furniture': ['Furniture & Utility', 'Assets Management > Furniture & Utility'],
       'assets-accessories': ['Accessories', 'Assets Management > Accessories'],
       'assets-other': ['Other Assets', 'Assets Management > Other Assets'],
-      'employee-list': ['Employee', 'Employee > Employee List'],
+      'employee-list': ['Employees', 'Employee Management'],
     };
 
     function isMobileTablet() {
@@ -4921,6 +5220,82 @@ input[type="file"].form-control {
 
     function openModal(modalId) {
       new bootstrap.Modal(document.getElementById(modalId)).show();
+    }
+
+    // ── EDIT PAGE (Full-page edit instead of modal) ──
+    const editPageModalMap = {
+      'domainac': 'modal-domainac',
+      'domain': 'modal-domain',
+      'server': 'modal-server',
+      'webmail': 'modal-webmail',
+      'linkedin': 'modal-linkedin',
+      'teams': 'modal-teams',
+      'telegram': 'modal-telegram',
+      'gmail': 'modal-gmail',
+      'socialmedia': 'modal-socialmedia',
+      'advertiser': 'modal-advertiser',
+      'bank': 'modal-bank',
+      'sim': 'modal-sim',
+      'employee': 'modal-employee',
+      'it-assets': 'modal-it-assets',
+    };
+
+    function openEditPage(type, label, breadcrumb) {
+      const modalId = editPageModalMap[type];
+      if (!modalId) { openModal(type); return; }
+      const modalEl = document.getElementById(modalId);
+      if (!modalEl) return;
+
+      // Clone the modal body content into the edit page
+      const modalBody = modalEl.querySelector('.modal-body');
+      const clonedBody = modalBody ? modalBody.cloneNode(true) : null;
+
+      document.getElementById('edit-page-title').textContent = 'Edit ' + label;
+      document.getElementById('edit-page-breadcrumb').innerHTML =
+        'Home &rsaquo; ' + breadcrumb + ' &rsaquo; <strong>Edit ' + label + '</strong>';
+
+      const contentEl = document.getElementById('edit-page-content');
+      contentEl.innerHTML = '';
+
+      if (clonedBody) {
+        // Wrap sections in styled cards
+        const card = document.createElement('div');
+        card.className = 'edit-page-card';
+        const header = document.createElement('div');
+        header.className = 'ep-card-header';
+        header.innerHTML = '<i class="bi bi-pencil-square me-2"></i>' + label + ' Details';
+        const body = document.createElement('div');
+        body.className = 'ep-card-body';
+        body.appendChild(clonedBody);
+        card.appendChild(header);
+        card.appendChild(body);
+        contentEl.appendChild(card);
+      }
+
+      document.getElementById('edit-page-overlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditPage() {
+      document.getElementById('edit-page-overlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function saveEditPage() {
+      // Show a brief success toast then close
+      closeEditPage();
+      // Show inline success notification
+      const toast = document.createElement('div');
+      toast.style.cssText = 'position:fixed;bottom:28px;right:28px;z-index:9999;background:#1e293b;color:#fff;border-radius:12px;padding:14px 22px;font-size:13.5px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(0,0,0,0.25);';
+      toast.innerHTML = '<i class="bi bi-check-circle-fill" style="color:#22c55e;font-size:18px;"></i> Changes saved successfully.';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function handleLogout() {
+      if (confirm('Are you sure you want to log out?')) {
+        alert('You have been successfully logged out.');
+      }
     }
 
     let cardToDelete = null;
